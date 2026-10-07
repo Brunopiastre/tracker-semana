@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#10151f">
+<title>Semana de entrenamiento</title>
+<script>
+  // Se activa antes de pintar para evitar un parpadeo: ?modo=fondo
+  if (new URLSearchParams(location.search).get('modo') === 'fondo') {
+    document.documentElement.classList.add('fondo');
+  }
+</script>
+<style>
+/* =====================================================================
+   AJUSTES DEL MODO FONDO (Lively Wallpaper)  ->  editá estos valores
+   ===================================================================== */
+:root {
+  --fondo-color: #0c1017;     /* color liso del fondo en modo fondo */
+  --panel-ancho: 27rem;       /* ancho del panel (se escala con la pantalla) */
+  --panel-derecha: 4vw;       /* distancia al borde derecho */
+  --panel-vertical: 50%;      /* 50% = centrado; 40% lo sube, 60% lo baja */
+  --panel-alto-max: 92vh;     /* alto máximo del panel */
+  --panel-opacidad: 0.78;     /* 0 = transparente, 1 = sólido */
+  --panel-blur: 12px;         /* desenfoque detrás del panel */
+  --escala: 1;                /* tamaño general: 0.8 más chico, 1.2 más grande */
+}
+
+/* ===== Paleta ===== */
+:root {
+  --bg: #10151f;
+  --panel-rgb: 21 27 38;
+  --superficie: #1c2433;
+  --borde: #2b3548;
+  --texto: #e9eef7;
+  --suave: #8f9bb2;
+  --peligro: #f0716b;
+}
+
+* { box-sizing: border-box; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--texto);
+  font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+  line-height: 1.35;
+  min-height: 100dvh;
+}
+button { font: inherit; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--texto); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+/* ===== Modo normal (celular) ===== */
+.panel { position: relative; max-width: 30rem; margin: 0 auto; min-height: 100dvh; }
+.contenido { padding: calc(1.4rem + env(safe-area-inset-top, 0px)) 1rem calc(2.5rem + env(safe-area-inset-bottom, 0px)); }
+
+/* ===== Modo fondo ===== */
+html.fondo { font-size: clamp(11px, calc(1.3vmin * var(--escala)), 40px); }
+html.fondo body { background: var(--fondo-color); overflow: hidden; height: 100vh; min-height: 0; }
+html.fondo .panel {
+  position: fixed;
+  right: var(--panel-derecha);
+  top: var(--panel-vertical);
+  transform: translateY(-50%);
+  width: var(--panel-ancho);
+  max-width: none;
+  min-height: 0;
+  max-height: var(--panel-alto-max);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: rgb(var(--panel-rgb) / var(--panel-opacidad));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  backdrop-filter: blur(var(--panel-blur));
+  border: 1px solid rgb(255 255 255 / 0.07);
+}
+html.fondo .contenido { padding: 1.1rem 1.1rem 1rem; overflow-y: auto; }
+html.fondo .contenido::-webkit-scrollbar { width: 0; }
+
+/* ===== Encabezado ===== */
+.encabezado { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
+.rango { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--suave); }
+.contador { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.contador small { font-size: 1rem; font-weight: 500; color: var(--suave); }
+
+.segmentos { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; margin-top: 0.9rem; }
+.seg { height: 0.45rem; border-radius: 99px; background: var(--superficie); transition: background 0.3s; }
+.seg.on { background: rgb(var(--rgb)); }
+
+/* ===== Secciones ===== */
+.seccion-titulo { display: flex; align-items: baseline; gap: 0.4rem; margin: 1.5rem 0 0.6rem; font-size: 0.85rem; font-weight: 600; color: var(--suave); }
+.seccion-titulo span { font-weight: 500; font-variant-numeric: tabular-nums; }
+.faltan { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.completa { margin: 0; font-size: 0.9rem; color: var(--suave); }
+
+/* ===== Chips ===== */
+.chip {
+  --rgb: 143 155 178;
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgb(var(--rgb) / 0.6);
+  background: rgb(var(--rgb) / 0.08);
+  font-size: 0.9rem;
+}
+.chip .punto { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: rgb(var(--rgb)); flex: none; }
+.chip svg { width: 0.85rem; height: 0.85rem; flex: none; }
+.chip.hecha { background: rgb(var(--rgb)); border-color: rgb(var(--rgb)); color: #0e131b; font-weight: 600; }
+.chip.hecha .quitar { opacity: 0.55; margin-left: 0.1rem; }
+
+/* ===== Días ===== */
+.dias { display: grid; gap: 0.5rem; }
+.dia {
+  display: grid; grid-template-columns: 3.4rem 1fr; gap: 0.6rem; align-items: center;
+  padding: 0.6rem 0.7rem;
+  border-radius: 0.9rem;
+  background: var(--superficie);
+  border: 1px solid transparent;
+}
+.dia.hoy { border-color: rgb(92 200 242 / 0.65); }
+.dia-nombre { font-size: 0.9rem; font-weight: 600; }
+.dia-fecha { font-size: 0.75rem; color: var(--suave); }
+.dia.hoy .dia-fecha { color: #5cc8f2; font-weight: 600; }
+.dia-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-height: 2.3rem; }
+.vacio {
+  width: 100%; text-align: left;
+  padding: 0.55rem 0.7rem;
+  border: 1px dashed var(--borde); border-radius: 0.7rem;
+  background: transparent; color: var(--suave); font-size: 0.85rem;
+}
+.sin-opciones { color: var(--suave); font-size: 0.85rem; padding-left: 0.2rem; }
+.mas {
+  width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  border: 1px dashed var(--borde); background: transparent; color: var(--suave);
+  display: inline-flex; align-items: center; justify-content: center; padding: 0;
+}
+.mas svg { width: 1rem; height: 1rem; }
+
+/* ===== Pie ===== */
+.pie { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem 0.9rem; margin-top: 1.5rem; }
+.btn-sec {
+  padding: 0.55rem 0.9rem; border-radius: 0.7rem;
+  background: transparent; border: 1px solid var(--borde); font-size: 0.85rem;
+}
+.btn-sec.peligro { border-color: var(--peligro); color: var(--peligro); }
+.btn-principal {
+  padding: 0.7rem 1.1rem; border-radius: 0.8rem; border: 0;
+  background: #5cc8f2; color: #0e131b; font-weight: 650; font-size: 0.95rem;
+}
+.link { background: none; border: 0; padding: 0.3rem 0; color: var(--suave); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; }
+.estado { margin-left: auto; display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--suave); }
+.estado i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--suave); }
+.estado[data-e="ok"] i { background: #4fd1a5; }
+.estado[data-e="pendiente"] i, .estado[data-e="conectando"] i, .estado[data-e="offline"] i { background: #f5a85a; }
+.estado[data-e="error"] i { background: var(--peligro); }
+
+/* ===== Pantalla de código ===== */
+#vistaCodigo p.ayuda { color: var(--suave); font-size: 0.9rem; margin: 0.6rem 0 1.2rem; }
+#inputCodigo {
+  width: 100%; padding: 0.8rem 0.9rem; border-radius: 0.8rem;
+  background: var(--superficie); border: 1px solid var(--borde);
+  color: var(--texto); font: inherit; font-size: 1rem;
+}
+.error { min-height: 1.2em; margin: 0.5rem 0 0.8rem; color: var(--peligro); font-size: 0.85rem; }
+.acciones { display: flex; gap: 0.6rem; align-items: center; }
+
+/* ===== Hoja de selección ===== */
+.sheet {
+  position: fixed; inset: 0; z-index: 20;
+  display: none; align-items: flex-end; justify-content: center;
+  background: rgb(5 8 12 / 0.65);
+}
+.sheet.abierto { display: flex; }
+.sheet-card {
+  width: 100%; max-width: 30rem;
+  background: #171e2b;
+  border-radius: 1.25rem 1.25rem 0 0;
+  padding: 1.1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
+  border: 1px solid var(--borde); border-bottom: 0;
+}
+.sheet-card h2 { margin: 0 0 0.9rem; font-size: 1.05rem; font-weight: 650; }
+.grid-dias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.grid-sesiones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+.op-dia {
+  display: flex; flex-direction: column; align-items: center; gap: 0.1rem;
+  padding: 0.7rem 0.2rem; border-radius: 0.8rem;
+  background: var(--superficie); border: 1px solid transparent;
+}
+.op-dia span { font-size: 0.8rem; color: var(--suave); }
+.op-dia b { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.op-dia.hoy { border-color: rgb(92 200 242 / 0.65); }
+.op-dia.hoy span { color: #5cc8f2; }
+.op-sesion { justify-content: flex-start; border-radius: 0.8rem; padding: 0.7rem 0.8rem; text-align: left; }
+.op-sesion small { color: var(--suave); font-size: 0.75rem; }
+.cancelar { display: block; width: 100%; margin-top: 0.9rem; padding: 0.7rem; border-radius: 0.8rem; background: transparent; border: 0; color: var(--suave); }
+html.fondo .sheet { position: absolute; align-items: center; }
+html.fondo .sheet-card { border-radius: 1rem; margin: 1rem; width: auto; border-bottom: 1px solid var(--borde); padding-bottom: 1rem; }
+
+/* ===== Aviso con deshacer ===== */
+.toast {
+  position: fixed; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); z-index: 30;
+  transform: translate(-50%, 1rem); opacity: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 0.9rem;
+  max-width: calc(100% - 2rem);
+  padding: 0.7rem 0.9rem 0.7rem 1rem; border-radius: 0.9rem;
+  background: #263044; border: 1px solid var(--borde);
+  font-size: 0.9rem; box-shadow: 0 8px 24px rgb(0 0 0 / 0.35);
+  transition: opacity 0.2s, transform 0.2s;
+}
+.toast.visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.toast button { background: none; border: 0; padding: 0.2rem 0.3rem; color: #5cc8f2; font-weight: 650; }
+html.fondo .toast { position: absolute; bottom: 1rem; }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="panel" id="panel">
+  <div class="contenido">
+
+    <!-- Pantalla para ingresar el código -->
+    <section id="vistaCodigo" hidden>
+      <h1>Tu código personal</h1>
+      <p class="ayuda">Escribilo igual en el celular y en la compu: el mismo código muestra la misma semana. Elegí uno largo y difícil de adivinar.</p>
+      <form id="formCodigo" novalidate>
+        <input id="inputCodigo" type="text" placeholder="ej. bruno-fuerte-2026" maxlength="64"
+               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Código personal">
+        <p class="error" id="errorCodigo" role="alert"></p>
+        <div class="acciones">
+          <button type="submit" class="btn-principal">Guardar código</button>
+          <button type="button" class="btn-sec" id="cancelarCodigo" hidden>Cancelar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tracker -->
+    <section id="vistaApp" hidden>
+      <header>
+        <div class="encabezado">
+          <div>
+            <h1>Esta semana</h1>
+            <p class="rango" id="rango"></p>
+          </div>
+          <div class="contador" aria-live="polite"><span id="hechas">0</span><small>/7</small></div>
+        </div>
+        <div class="segmentos" id="segmentos" role="progressbar" aria-label="Sesiones completadas" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"></div>
+      </header>
+
+      <div class="seccion-titulo">Te falta <span id="cuentaFaltan"></span></div>
+      <div id="faltan"></div>
+
+      <div class="seccion-titulo">Días</div>
+      <div class="dias" id="dias"></div>
+
+      <div class="pie">
+        <button type="button" class="btn-sec" id="btnReset">Reiniciar semana</button>
+        <button type="button" class="link" id="btnCambiarCodigo">Cambiar código</button>
+        <span class="estado" id="estado" data-e="local"><i></i><b id="estadoTexto" style="font-weight:500"></b></span>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Hoja para elegir día o sesión -->
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitulo">
+    <div class="sheet-card">
+      <h2 id="sheetTitulo"></h2>
+      <div id="sheetOpciones"></div>
+      <button type="button" class="cancelar" id="sheetCancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Aviso con deshacer -->
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toastTexto"></span>
+    <button type="button" id="toastDeshacer">Deshacer</button>
+  </div>
+</main>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {
+  initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager,
+  doc, onSnapshot, setDoc, deleteField
+} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+/* =====================================================================
+   CONFIGURACIÓN DE FIREBASE  ->  reemplazá este bloque con el tuyo
+   (Firebase Console > Project settings > General > Your apps > Web app)
+   ===================================================================== */
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBPul_mmnz9VlLEzBq-U-aiNQhEgamEcJQ",
+  authDomain: "rutinagym-17929.firebaseapp.com",
+  projectId: "rutinagym-17929",
+  storageBucket: "rutinagym-17929.firebasestorage.app",
+  messagingSenderId: "907152308591",
+  appId: "1:907152308591:web:823ee12ba5d639a3c1509a"
+};
+/* ===================================================================== */
+
+const COLECCION = "seguimiento";
+const LS_CODIGO = "tracker_codigo";
+const LS_CACHE = "tracker_cache_";
+
+const SESIONES = [
+  { id: "correr1",  nombre: "Correr 1", rgb: "92 200 242" },
+  { id: "pierna",   nombre: "Pierna",   rgb: "245 168 90" },
+  { id: "empuje",   nombre: "Empuje",   rgb: "240 113 107" },
+  { id: "tiron",    nombre: "Tirón",    rgb: "169 139 245" },
+  { id: "correr2",  nombre: "Correr 2", rgb: "92 200 242" },
+  { id: "fondo",    nombre: "Fondo",    rgb: "79 140 245", nota: "tirada larga" },
+  { id: "descanso", nombre: "Descanso", rgb: "143 155 178" }
+];
+const DIAS = [
+  { abr: "Dom", nombre: "Domingo" }, { abr: "Lun", nombre: "Lunes" }, { abr: "Mar", nombre: "Martes" },
+  { abr: "Mié", nombre: "Miércoles" }, { abr: "Jue", nombre: "Jueves" }, { abr: "Vie", nombre: "Viernes" },
+  { abr: "Sáb", nombre: "Sábado" }
+];
+const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+const ICONO_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>';
+const ICONO_X = '<svg class="quitar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
+const ICONO_MAS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>';
+
+const $ = (s) => document.querySelector(s);
+const sesionPorId = (id) => SESIONES.find((s) => s.id === id);
+
+/* ---------- Almacenamiento local (con protección por si falla) ---------- */
+const ls = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+};
+
+/* ---------- Fechas ---------- */
+function claveSemana(d) {
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay()); // domingo
+  return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
+}
+function fechasSemana(clave) {
+  const [y, m, d] = clave.split("-").map(Number);
+  return Array.from({ length: 7 }, (_, i) => new Date(y, m - 1, d + i));
+}
+
+/* ---------- Firebase ---------- */
+const firebaseListo = !Object.values(FIREBASE_CONFIG).some((v) => !v || String(v).includes("PEGAR"));
+let db = null;
+if (firebaseListo) {
+  try {
+    const app = initializeApp(FIREBASE_CONFIG);
+    try {
+      db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+    } catch {
+      db = getFirestore(app);
+    }
+  } catch (e) {
+    console.error("No se pudo iniciar Firebase:", e);
+  }
+}
+
+/* ---------- Estado ---------- */
+const params = new URLSearchParams(location.search);
+let codigo = null;
+let semanas = {};                       // { "2026-10-04": { pierna: 2, ... } }
+let semanaKey = claveSemana(new Date());
+let hoyStr = new Date().toDateString();
+let desuscribir = null;
+let ctxSheet = null;                    // { tipo: "dia", sid } | { tipo: "sesion", dia }
+
+function normalizarCodigo(texto) {
+  const limpio = String(texto || "").trim().toLowerCase().replace(/\s+/g, "");
+  if (!/^[a-z0-9_-]*$/.test(limpio)) return { ok: false, error: "Usá solo letras, números, guion (-) y guion bajo (_)." };
+  if (limpio.length < 8) return { ok: false, error: "El código necesita al menos 8 caracteres." };
+  return { ok: true, valor: limpio };
+}
+
+function asignadoActual() {
+  const raw = semanas[semanaKey] || {};
+  const out = {};
+  for (const s of SESIONES) {
+    const d = raw[s.id];
+    if (Number.isInteger(d) && d >= 0 && d <= 6) out[s.id] = d;
+  }
+  return out;
+}
+
+function guardarCache() { if (codigo) ls.set(LS_CACHE + codigo, JSON.stringify(semanas)); }
+function cargarCache() {
+  try { semanas = JSON.parse(ls.get(LS_CACHE + codigo) || "{}") || {}; } catch { semanas = {}; }
+}
+
+/* ---------- Estado de sincronización ---------- */
+const TEXTOS_ESTADO = {
+  local: "Solo en este dispositivo",
+  ok: "Sincronizado",
+  pendiente: "Guardando…",
+  conectando: "Conectando…",
+  offline: "Sin conexión",
+  error: "Error al sincronizar"
+};
+let estadoActual = "local";
+function setEstado(e) {
+  estadoActual = e;
+  $("#estado").dataset.e = e;
+  $("#estadoTexto").textContent = (e === "local" && !firebaseListo) ? "Firebase sin configurar" : TEXTOS_ESTADO[e];
+}
+
+/* ---------- Escritura ---------- */
+function escribir(wk, cambios) {
+  const sem = { ...(semanas[wk] || {}) };
+  for (const [k, v] of Object.entries(cambios)) {
+    if (v === null) delete sem[k]; else sem[k] = v;
+  }
+  semanas[wk] = sem;
+  guardarCache();
+  render();
+  if (!db || !codigo) return;
+  const obj = {};
+  for (const [k, v] of Object.entries(cambios)) obj[k] = v === null ? deleteField() : v;
+  setDoc(doc(db, COLECCION, codigo), { semanas: { [wk]: obj } }, { merge: true })
+    .catch((e) => { console.error(e); setEstado("error"); });
+}
+
+function suscribir() {
+  if (desuscribir) { desuscribir(); desuscribir = null; }
+  if (!db || !codigo) { setEstado("local"); return; }
+  setEstado(navigator.onLine ? "conectando" : "offline");
+  const ref = doc(db, COLECCION, codigo);
+  desuscribir = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
+    if (!snap.exists()) {
+      if (snap.metadata.fromCache) return;                // todavía no sabemos: no pisar lo local
+      if (Object.keys(semanas).length) {                  // el servidor no tiene nada: subir lo local
+        setDoc(ref, { semanas }, { merge: true }).catch((e) => { console.error(e); setEstado("error"); });
+      }
+      setEstado("ok");
+      return;
+    }
+    semanas = snap.data().semanas || {};
+    guardarCache();
+    render();
+    if (snap.metadata.hasPendingWrites) setEstado("pendiente");
+    else if (snap.metadata.fromCache) setEstado(navigator.onLine ? "conectando" : "offline");
+    else setEstado("ok");
+  }, (err) => { console.error(err); setEstado("error"); });
+}
+
+/* ---------- Acciones ---------- */
+function asignar(sid, dia) { escribir(semanaKey, { [sid]: dia }); }
+
+function quitar(sid) {
+  const wk = semanaKey;
+  const dia = asignadoActual()[sid];
+  if (dia === undefined) return;
+  escribir(wk, { [sid]: null });
+  mostrarToast(`${sesionPorId(sid).nombre} quitada del ${DIAS[dia].nombre.toLowerCase()}`, () => escribir(wk, { [sid]: dia }));
+}
+
+function reiniciar() {
+  const wk = semanaKey;
+  const previo = { ...asignadoActual() };
+  const ids = Object.keys(previo);
+  if (!ids.length) { mostrarToast("No hay nada para reiniciar"); return; }
+  const cambios = {};
+  ids.forEach((id) => (cambios[id] = null));
+  escribir(wk, cambios);
+  mostrarToast("Semana reiniciada", () => escribir(wk, previo));
+}
+
+/* ---------- Render ---------- */
+function render() {
+  const a = asignadoActual();
+  const fechas = fechasSemana(semanaKey);
+  const hoyIdx = new Date().getDay();
+
+  // Rango
+  const f0 = fechas[0], f6 = fechas[6];
+  $("#rango").textContent = f0.getMonth() === f6.getMonth()
+    ? `${f0.getDate()} – ${f6.getDate()} ${MESES[f6.getMonth()]}`
+    : `${f0.getDate()} ${MESES[f0.getMonth()]} – ${f6.getDate()} ${MESES[f6.getMonth()]}`;
+
+  // Contador y barra segmentada (cada sesión hecha enciende un segmento con su color)
+  const hechas = SESIONES.filter((s) => a[s.id] !== undefined);
+  $("#hechas").textContent = hechas.length;
+  const barra = $("#segmentos");
+  barra.setAttribute("aria-valuenow", hechas.length);
+  barra.innerHTML = SESIONES.map((_, i) =>
+    i < hechas.length ? `<i class="seg on" style="--rgb:${hechas[i].rgb}"></i>` : '<i class="seg"></i>'
+  ).join("");
+
+  // Te falta
+  const faltan = SESIONES.filter((s) => a[s.id] === undefined);
+  $("#cuentaFaltan").textContent = faltan.length ? `(${faltan.length})` : "";
+  $("#faltan").className = faltan.length ? "faltan" : "";
+  $("#faltan").innerHTML = faltan.length
+    ? faltan.map((s) => `<button type="button" class="chip" style="--rgb:${s.rgb}" data-accion="faltante" data-sid="${s.id}"><span class="punto"></span>${s.nombre}</button>`).join("")
+    : '<p class="completa">Semana completa. Todas las sesiones están marcadas.</p>';
+
+  // Días
+  $("#dias").innerHTML = DIAS.map((d, i) => {
+    const hechasDia = SESIONES.filter((s) => a[s.id] === i);
+    const esHoy = i === hoyIdx;
+    const fecha = fechas[i];
+    let contenido;
+    if (hechasDia.length) {
+      contenido = hechasDia.map((s) =>
+        `<button type="button" class="chip hecha" style="--rgb:${s.rgb}" data-accion="chip" data-sid="${s.id}" aria-label="Quitar ${s.nombre} del ${d.nombre.toLowerCase()}">${ICONO_CHECK}${s.nombre}${ICONO_X}</button>`
+      ).join("") + (faltan.length ? `<button type="button" class="mas" data-accion="dia" data-dia="${i}" aria-label="Agregar sesión al ${d.nombre.toLowerCase()}">${ICONO_MAS}</button>` : "");
+    } else {
+      contenido = faltan.length
+        ? `<button type="button" class="vacio" data-accion="dia" data-dia="${i}">Agregar sesión</button>`
+        : '<span class="sin-opciones">Libre</span>';
+    }
+    return `<div class="dia${esHoy ? " hoy" : ""}"${esHoy ? ' aria-current="date"' : ""}>
+      <div><div class="dia-nombre">${d.abr}</div><div class="dia-fecha">${esHoy ? "Hoy" : `${fecha.getDate()} ${MESES[fecha.getMonth()]}`}</div></div>
+      <div class="dia-chips">${contenido}</div></div>`;
+  }).join("");
+}
+
+/* ---------- Hoja de selección ---------- */
+function abrirSheetDia(sid) {
+  const s = sesionPorId(sid);
+  const fechas = fechasSemana(semanaKey);
+  const hoyIdx = new Date().getDay();
+  ctxSheet = { tipo: "dia", sid };
+  $("#sheetTitulo").textContent = `¿Qué día fue ${s.nombre}?`;
+  $("#sheetOpciones").className = "grid-dias";
+  $("#sheetOpciones").innerHTML = DIAS.map((d, i) =>
+    `<button type="button" class="op-dia${i === hoyIdx ? " hoy" : ""}" data-accion="elegir-dia" data-dia="${i}"><span>${d.abr}</span><b>${fechas[i].getDate()}</b></button>`
+  ).join("");
+  abrirSheet();
+}
+
+function abrirSheetSesion(dia) {
+  const a = asignadoActual();
+  const faltan = SESIONES.filter((s) => a[s.id] === undefined);
+  if (!faltan.length) return;
+  ctxSheet = { tipo: "sesion", dia };
+  $("#sheetTitulo").textContent = `¿Qué hiciste el ${DIAS[dia].nombre.toLowerCase()}?`;
+  $("#sheetOpciones").className = "grid-sesiones";
+  $("#sheetOpciones").innerHTML = faltan.map((s) =>
+    `<button type="button" class="chip op-sesion" style="--rgb:${s.rgb}" data-accion="elegir-sesion" data-sid="${s.id}"><span class="punto"></span><span>${s.nombre}${s.nota ? `<br><small>${s.nota}</small>` : ""}</span></button>`
+  ).join("");
+  abrirSheet();
+}
+
+function abrirSheet() {
+  $("#sheet").classList.add("abierto");
+  const primero = $("#sheetOpciones button");
+  if (primero) primero.focus({ preventScroll: true });
+}
+function cerrarSheet() { $("#sheet").classList.remove("abierto"); ctxSheet = null; }
+
+/* ---------- Aviso con deshacer ---------- */
+let toastTimer = null, toastUndo = null;
+function mostrarToast(texto, undo) {
+  clearTimeout(toastTimer);
+  $("#toastTexto").textContent = texto;
+  toastUndo = undo || null;
+  $("#toastDeshacer").hidden = !undo;
+  $("#toast").classList.add("visible");
+  toastTimer = setTimeout(ocultarToast, 6000);
+}
+function ocultarToast() { $("#toast").classList.remove("visible"); toastUndo = null; }
+
+/* ---------- Pantallas ---------- */
+function mostrarPantallaCodigo(permitirCancelar) {
+  $("#vistaApp").hidden = true;
+  $("#vistaCodigo").hidden = false;
+  $("#cancelarCodigo").hidden = !permitirCancelar;
+  $("#errorCodigo").textContent = "";
+  $("#inputCodigo").value = permitirCancelar && codigo ? codigo : "";
+  setTimeout(() => $("#inputCodigo").focus({ preventScroll: true }), 50);
+}
+function mostrarApp() {
+  $("#vistaCodigo").hidden = true;
+  $("#vistaApp").hidden = false;
+  render();
+}
+
+/* ---------- Eventos ---------- */
+document.addEventListener("click", (e) => {
+  if (e.target === $("#sheet")) { cerrarSheet(); return; }
+  const el = e.target.closest("[data-accion]");
+  if (!el) return;
+  const { accion, sid } = el.dataset;
+  const dia = el.dataset.dia !== undefined ? Number(el.dataset.dia) : undefined;
+  if (accion === "faltante") abrirSheetDia(sid);
+  else if (accion === "dia") abrirSheetSesion(dia);
+  else if (accion === "chip") quitar(sid);
+  else if (accion === "elegir-dia" && ctxSheet) { const s = ctxSheet.sid; cerrarSheet(); asignar(s, dia); }
+  else if (accion === "elegir-sesion" && ctxSheet) { const d = ctxSheet.dia; cerrarSheet(); asignar(sid, d); }
+});
+
+$("#sheetCancelar").addEventListener("click", cerrarSheet);
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarSheet(); });
+
+$("#toastDeshacer").addEventListener("click", () => {
+  const fn = toastUndo;
+  ocultarToast();
+  if (fn) fn();
+});
+
+// Reiniciar: confirmación en dos toques
+let resetArmado = false, resetTimer = null;
+function desarmarReset() {
+  resetArmado = false;
+  clearTimeout(resetTimer);
+  const b = $("#btnReset");
+  b.textContent = "Reiniciar semana";
+  b.classList.remove("peligro");
+}
+$("#btnReset").addEventListener("click", () => {
+  if (!resetArmado) {
+    resetArmado = true;
+    $("#btnReset").textContent = "Tocá de nuevo para confirmar";
+    $("#btnReset").classList.add("peligro");
+    resetTimer = setTimeout(desarmarReset, 3500);
+  } else {
+    desarmarReset();
+    reiniciar();
+  }
+});
+
+$("#btnCambiarCodigo").addEventListener("click", () => mostrarPantallaCodigo(true));
+$("#cancelarCodigo").addEventListener("click", mostrarApp);
+$("#formCodigo").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const r = normalizarCodigo($("#inputCodigo").value);
+  if (!r.ok) { $("#errorCodigo").textContent = r.error; return; }
+  codigo = r.valor;
+  ls.set(LS_CODIGO, codigo);
+  cargarCache();
+  mostrarApp();
+  suscribir();
+});
+
+// Conexión
+window.addEventListener("offline", () => { if (db && codigo) setEstado("offline"); });
+window.addEventListener("online", () => { if (db && codigo && estadoActual === "offline") setEstado("conectando"); });
+
+// Cambio de día / semana (importante para el fondo, que queda abierto días)
+function revisarFecha() {
+  const k = claveSemana(new Date());
+  const h = new Date().toDateString();
+  if (k !== semanaKey || h !== hoyStr) {
+    semanaKey = k;
+    hoyStr = h;
+    if (!$("#vistaApp").hidden) render();
+  }
+}
+setInterval(revisarFecha, 30000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarFecha(); });
+
+/* ---------- Inicio ---------- */
+(function iniciar() {
+  // Atajo: ?codigo=mi-codigo-largo guarda el código (útil en Lively, que tiene su propio almacenamiento)
+  const deURL = params.get("codigo");
+  if (deURL) {
+    const r = normalizarCodigo(deURL);
+    if (r.ok) ls.set(LS_CODIGO, r.valor);
+  }
+  const guardado = ls.get(LS_CODIGO);
+  const r = guardado ? normalizarCodigo(guardado) : { ok: false };
+  if (r.ok) {
+    codigo = r.valor;
+    cargarCache();
+    mostrarApp();
+    suscribir();
+  } else {
+    setEstado("local");
+    mostrarPantallaCodigo(false);
+  }
+})();
+</script>
+</body>
+</html>
