@@ -30,7 +30,7 @@
   --escala: 1;                /* tamaño general: 0.8 más chico, 1.2 más grande */
 
   /* Columna izquierda: fechas importantes */
-  --fechas-ancho: 12.5rem;
+  --fechas-ancho: 14.5rem;
   --fechas-izquierda: 7vw;    /* 7vw esquiva los íconos del escritorio; bajalo a 2vw para pegarlo al borde */
   /* Columna derecha: notitas */
   --notas-ancho: 13rem;
@@ -231,7 +231,7 @@ html:not(.fondo) .lateral { display: none; }
     max-height: 92vh; overflow-y: auto;
   }
   html:not(.fondo) .lateral::-webkit-scrollbar { width: 0; }
-  html:not(.fondo) .lateral.izq { left: 2rem; width: 13rem; }
+  html:not(.fondo) .lateral.izq { left: 2rem; width: 14.5rem; }
   html:not(.fondo) .lateral.der { right: 2rem; width: 14rem; }
   html:not(.fondo) .lateral .seccion-titulo { margin-top: 0; }
 }
@@ -445,10 +445,10 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "o
    Podés agregar o quitar líneas libremente.
    ===================================================================== */
 const FECHAS = [
-  { nombre: "Fecha 1", fecha: "", rgb: "92 200 242" },
-  { nombre: "Fecha 2", fecha: "", rgb: "245 168 90" },
-  { nombre: "Fecha 3", fecha: "", rgb: "169 139 245" },
-  { nombre: "Fecha 4", fecha: "", rgb: "79 209 165" }
+  { nombre: "2º parcial de Física",    fecha: "2026-11-02", rgb: "92 200 242" },
+  { nombre: "Recuperatorio de Física", fecha: "2026-11-09", rgb: "245 168 90" },
+  { nombre: "Teleinformática",         fecha: "2026-11-23", rgb: "169 139 245" },
+  { nombre: "Viaje",                   fecha: "2026-12-17", rgb: "79 209 165" }
 ];
 
 // Notitas (columna derecha): una por color. Agregá o quitá colores para cambiar la cantidad.
