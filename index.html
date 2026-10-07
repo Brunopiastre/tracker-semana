@@ -6,6 +6,9 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#10151f">
 <title>Semana de entrenamiento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
   // Se activa antes de pintar para evitar un parpadeo: ?modo=fondo
   if (new URLSearchParams(location.search).get('modo') === 'fondo') {
@@ -36,6 +39,10 @@
   --texto: #e9eef7;
   --suave: #8f9bb2;
   --peligro: #f0716b;
+
+  /* Tipografías */
+  --fuente-titulo: 'Barlow Condensed', 'Arial Narrow', 'Segoe UI', sans-serif;
+  --fuente-texto: 'Barlow', 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -44,7 +51,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--texto);
-  font-family: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", sans-serif;
+  font-family: var(--fuente-texto);
   line-height: 1.35;
   min-height: 100dvh;
 }
@@ -83,9 +90,10 @@ html.fondo .contenido::-webkit-scrollbar { width: 0; }
 
 /* ===== Encabezado ===== */
 .encabezado { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
-h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
+h1, .sheet-card h2, .dia-nombre, .seccion-titulo, .chip, .contador { font-family: var(--fuente-titulo); }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: 0; line-height: 1.1; }
 .rango { margin: 0.15rem 0 0; font-size: 0.85rem; color: var(--suave); }
-.contador { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.contador { font-size: 2.3rem; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
 .contador small { font-size: 1rem; font-weight: 500; color: var(--suave); }
 
 .segmentos { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.25rem; margin-top: 0.9rem; }
@@ -93,7 +101,7 @@ h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
 .seg.on { background: rgb(var(--rgb)); }
 
 /* ===== Secciones ===== */
-.seccion-titulo { display: flex; align-items: baseline; gap: 0.4rem; margin: 1.5rem 0 0.6rem; font-size: 0.85rem; font-weight: 600; color: var(--suave); }
+.seccion-titulo { display: flex; align-items: baseline; gap: 0.4rem; margin: 1.5rem 0 0.6rem; font-size: 1.1rem; font-weight: 700; color: var(--texto); }
 .seccion-titulo span { font-weight: 500; font-variant-numeric: tabular-nums; }
 .faltan { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 .completa { margin: 0; font-size: 0.9rem; color: var(--suave); }
@@ -106,11 +114,13 @@ h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
   border-radius: 999px;
   border: 1px solid rgb(var(--rgb) / 0.6);
   background: rgb(var(--rgb) / 0.08);
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
 }
 .chip .punto { width: 0.55rem; height: 0.55rem; border-radius: 50%; background: rgb(var(--rgb)); flex: none; }
 .chip svg { width: 0.85rem; height: 0.85rem; flex: none; }
-.chip.hecha { background: rgb(var(--rgb)); border-color: rgb(var(--rgb)); color: #0e131b; font-weight: 600; }
+.chip.hecha { background: rgb(var(--rgb)); border-color: rgb(var(--rgb)); color: #0e131b; font-weight: 700; }
 .chip.hecha .quitar { opacity: 0.55; margin-left: 0.1rem; }
 
 /* ===== Días ===== */
@@ -123,7 +133,7 @@ h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
   border: 1px solid transparent;
 }
 .dia.hoy { border-color: rgb(92 200 242 / 0.65); }
-.dia-nombre { font-size: 0.9rem; font-weight: 600; }
+.dia-nombre { font-size: 1.2rem; font-weight: 700; line-height: 1.1; }
 .dia-fecha { font-size: 0.75rem; color: var(--suave); }
 .dia.hoy .dia-fecha { color: #5cc8f2; font-weight: 600; }
 .dia-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; min-height: 2.3rem; }
@@ -183,7 +193,7 @@ h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
   padding: 1.1rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
   border: 1px solid var(--borde); border-bottom: 0;
 }
-.sheet-card h2 { margin: 0 0 0.9rem; font-size: 1.05rem; font-weight: 650; }
+.sheet-card h2 { margin: 0 0 0.9rem; font-size: 1.4rem; font-weight: 700; }
 .grid-dias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
 .grid-sesiones { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
 .op-dia {
@@ -196,7 +206,7 @@ h1 { margin: 0; font-size: 1.5rem; font-weight: 650; letter-spacing: -0.01em; }
 .op-dia.hoy { border-color: rgb(92 200 242 / 0.65); }
 .op-dia.hoy span { color: #5cc8f2; }
 .op-sesion { justify-content: flex-start; border-radius: 0.8rem; padding: 0.7rem 0.8rem; text-align: left; }
-.op-sesion small { color: var(--suave); font-size: 0.75rem; }
+.op-sesion small { color: var(--suave); font-size: 0.8rem; font-family: var(--fuente-texto); font-weight: 400; }
 .cancelar { display: block; width: 100%; margin-top: 0.9rem; padding: 0.7rem; border-radius: 0.8rem; background: transparent; border: 0; color: var(--suave); }
 html.fondo .sheet { position: absolute; align-items: center; }
 html.fondo .sheet-card { border-radius: 1rem; margin: 1rem; width: auto; border-bottom: 1px solid var(--borde); padding-bottom: 1rem; }
