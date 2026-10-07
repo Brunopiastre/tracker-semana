@@ -22,12 +22,19 @@
 :root {
   --fondo-color: #0c1017;     /* color liso del fondo en modo fondo */
   --panel-ancho: 27rem;       /* ancho del panel (se escala con la pantalla) */
-  --panel-derecha: 4vw;       /* distancia al borde derecho */
+  --panel-derecha: calc(var(--notas-derecha) + var(--notas-ancho) + 2vw); /* queda a la izquierda de las notas */
   --panel-vertical: 50%;      /* 50% = centrado; 40% lo sube, 60% lo baja */
   --panel-alto-max: 92vh;     /* alto máximo del panel */
   --panel-opacidad: 0.78;     /* 0 = transparente, 1 = sólido */
   --panel-blur: 12px;         /* desenfoque detrás del panel */
   --escala: 1;                /* tamaño general: 0.8 más chico, 1.2 más grande */
+
+  /* Columna izquierda: fechas importantes */
+  --fechas-ancho: 12.5rem;
+  --fechas-izquierda: 7vw;    /* 7vw esquiva los íconos del escritorio; bajalo a 2vw para pegarlo al borde */
+  /* Columna derecha: notitas */
+  --notas-ancho: 13rem;
+  --notas-derecha: 2.5vw;
 }
 
 /* ===== Paleta ===== */
@@ -60,7 +67,7 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--texto); out
 [hidden] { display: none !important; }
 
 /* ===== Modo normal (celular) ===== */
-.panel { position: relative; max-width: 30rem; margin: 0 auto; min-height: 100dvh; }
+.panel { position: relative; max-width: 30rem; margin: 0 auto; }
 .contenido { padding: calc(1.4rem + env(safe-area-inset-top, 0px)) 1rem calc(2.5rem + env(safe-area-inset-bottom, 0px)); }
 
 /* ===== Modo fondo ===== */
@@ -155,6 +162,62 @@ h1 { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: 0; line-heigh
 .dia-fecha { font-size: 0.75rem; color: var(--suave); }
 .dia.hoy .dia-nombre, .dia.hoy .dia-fecha { color: #5cc8f2; }
 .dia.hoy .dia-fecha { font-weight: 600; }
+
+/* ===== Columnas laterales: fechas (izq) y notas (der) ===== */
+.lateral { max-width: 30rem; margin: 0 auto; padding: 0 1rem; display: flex; flex-direction: column; }
+.lateral.der { padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px)); }
+.fechas, .notas { display: grid; gap: 0.6rem; }
+
+.cuenta {
+  --rgb: 143 155 178;
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.9rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-left: 0.3rem solid rgb(var(--rgb));
+}
+.cuenta-num { font-family: var(--fuente-titulo); font-size: 2.1rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2.2rem; text-align: center; }
+.cuenta-info { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.cuenta-nombre { font-family: var(--fuente-titulo); font-size: 1.1rem; font-weight: 700; line-height: 1.1; overflow-wrap: anywhere; }
+.cuenta-resto { font-size: 0.75rem; color: var(--suave); line-height: 1.2; }
+.cuenta.vacia .cuenta-num { color: var(--suave); }
+
+.nota {
+  --rgb: 245 208 120;
+  border-radius: 0.8rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-top: 0.25rem solid rgb(var(--rgb));
+  overflow: hidden;
+}
+.nota:focus-within { border-color: rgb(var(--rgb)); }
+.nota textarea {
+  display: block; width: 100%; min-height: 4.2rem; max-height: 10rem; resize: none;
+  padding: 0.55rem 0.75rem; border: 0; background: transparent; color: var(--texto);
+  font: inherit; font-size: 1rem; line-height: 1.35;
+  field-sizing: content;
+}
+.nota textarea::placeholder { color: var(--suave); opacity: 0.7; }
+.nota textarea:focus-visible { outline: none; }
+
+html.fondo .lateral {
+  position: fixed; top: var(--panel-vertical); transform: translateY(-50%);
+  max-width: none; margin: 0; padding: 0;
+}
+html.fondo .lateral.izq { left: var(--fechas-izquierda); width: var(--fechas-ancho); }
+html.fondo .lateral.der { right: var(--notas-derecha); width: var(--notas-ancho); }
+html.fondo .lateral .seccion-titulo { display: none; }
+html.fondo .fechas, html.fondo .notas { gap: 0.7rem; }
+html.fondo .cuenta, html.fondo .nota {
+  background: rgb(var(--panel-rgb) / var(--panel-opacidad));
+  -webkit-backdrop-filter: blur(var(--panel-blur));
+  backdrop-filter: blur(var(--panel-blur));
+  border-color: rgb(255 255 255 / 0.07);
+}
+html.fondo .cuenta { border-left-color: rgb(var(--rgb)); }
+html.fondo .nota { border-top-color: rgb(var(--rgb)); }
+html.fondo .nota textarea { font-size: 0.9rem; }
 
 /* ===== Pie ===== */
 .pie { display: flex; align-items: center; flex-wrap: wrap; gap: 0.6rem 0.9rem; margin-top: 1.5rem; }
@@ -302,6 +365,18 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
   </div>
 </main>
 
+<!-- Columna izquierda (fondo) / sección Fechas (celular) -->
+<aside class="lateral izq" id="lateralIzq" aria-label="Fechas importantes" hidden>
+  <div class="seccion-titulo">Fechas importantes</div>
+  <div class="fechas" id="fechasLista"></div>
+</aside>
+
+<!-- Columna derecha (fondo) / sección Notas (celular) -->
+<aside class="lateral der" id="lateralDer" aria-label="Notas" hidden>
+  <div class="seccion-titulo">Notas</div>
+  <div class="notas" id="notasLista"></div>
+</aside>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {
@@ -345,6 +420,24 @@ const DIAS = [
   { abr: "Sáb", nombre: "Sábado" }
 ];
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+/* =====================================================================
+   FECHAS IMPORTANTES (columna izquierda del fondo)
+   Completá "nombre" y "fecha" con formato AAAA-MM-DD (hora opcional:
+   "2026-12-15T09:30"). Con fecha: "" muestra "Sin fecha".
+   Podés agregar o quitar líneas libremente.
+   ===================================================================== */
+const FECHAS = [
+  { nombre: "Fecha 1", fecha: "", rgb: "92 200 242" },
+  { nombre: "Fecha 2", fecha: "", rgb: "245 168 90" },
+  { nombre: "Fecha 3", fecha: "", rgb: "169 139 245" },
+  { nombre: "Fecha 4", fecha: "", rgb: "79 209 165" }
+];
+
+// Notitas (columna derecha): una por color. Agregá o quitá colores para cambiar la cantidad.
+const COLORES_NOTAS = ["245 208 120", "120 220 190", "240 150 170", "160 190 250", "200 160 245"];
+const IDS_NOTAS = COLORES_NOTAS.map((_, i) => "n" + (i + 1));
+const LS_NOTAS = "tracker_notas_";
 
 const ICONO_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>';
 const ICONO_X = '<svg class="quitar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
@@ -412,9 +505,16 @@ function asignadoActual() {
   return out;
 }
 
+let notas = {};                          // { n1: "texto", ... }
+const pendientesNotas = new Set();       // notas con cambios locales todavía no enviados
+const timersNotas = {};
+
 function guardarCache() { if (codigo) ls.set(LS_CACHE + codigo, JSON.stringify(semanas)); }
+function guardarCacheNotas() { if (codigo) ls.set(LS_NOTAS + codigo, JSON.stringify(notas)); }
 function cargarCache() {
   try { semanas = JSON.parse(ls.get(LS_CACHE + codigo) || "{}") || {}; } catch { semanas = {}; }
+  try { notas = JSON.parse(ls.get(LS_NOTAS + codigo) || "{}") || {}; } catch { notas = {}; }
+  pendientesNotas.clear();
 }
 
 /* ---------- Estado de sincronización ---------- */
@@ -428,7 +528,7 @@ const TEXTOS_ESTADO = {
 };
 let estadoActual = "local";
 const AYUDAS_ERROR = {
-  "permission-denied": "Firebase rechazó el acceso. Revisá que las reglas de Firestore estén publicadas y que tu código tenga 8 o más caracteres.",
+  "permission-denied": "Firebase rechazó el acceso. Revisá que las reglas de Firestore estén publicadas (permitiendo los campos semanas y notas) y que tu código tenga 8 o más caracteres.",
   "not-found": "No se encontró la base de datos. Revisá que esté creada y que su ID sea el mismo que ID_BASE_DE_DATOS en el archivo.",
   "unavailable": "No se pudo conectar con Firebase. Revisá tu internet o si algún bloqueador de anuncios lo está frenando.",
   "failed-precondition": "Firestore no pudo iniciar en este navegador. Probá recargar con Ctrl + Shift + R."
@@ -480,14 +580,23 @@ function suscribir() {
     if (!snap.exists()) {
       if (snap.metadata.fromCache) return;                // todavía no sabemos: no pisar lo local
       if (Object.keys(semanas).length) {                  // el servidor no tiene nada: subir lo local
-        setDoc(ref, { semanas }, { merge: true }).catch(falloSync);
+        const subir = { semanas };
+        if (IDS_NOTAS.some((id) => notas[id])) subir.notas = notas;
+        setDoc(ref, subir, { merge: true }).catch(falloSync);
       }
       setEstado("ok");
       return;
     }
-    semanas = snap.data().semanas || {};
+    const datos = snap.data();
+    semanas = datos.semanas || {};
+    const remotas = datos.notas || {};
+    IDS_NOTAS.forEach((id) => {
+      if (!pendientesNotas.has(id)) notas[id] = typeof remotas[id] === "string" ? remotas[id] : "";
+    });
     guardarCache();
+    guardarCacheNotas();
     render();
+    pintarNotas();
     if (snap.metadata.hasPendingWrites) setEstado("pendiente");
     else if (snap.metadata.fromCache) setEstado(navigator.onLine ? "conectando" : "offline");
     else setEstado("ok");
@@ -574,6 +683,62 @@ function render() {
   }).join("");
 }
 
+/* ---------- Fechas importantes ---------- */
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function objetivoFecha(txt) {
+  if (!txt) return null;
+  const d = new Date(txt.length === 10 ? txt + "T00:00:00" : txt);
+  return isNaN(d) ? null : d;
+}
+
+function renderFechas() {
+  const ahora = new Date();
+  const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
+  $("#fechasLista").innerHTML = FECHAS.map((f) => {
+    const obj = objetivoFecha(f.fecha);
+    let num = "—", resto = "Sin fecha", clase = " vacia";
+    if (obj) {
+      const diff = obj - ahora;
+      const objDia = new Date(obj.getFullYear(), obj.getMonth(), obj.getDate()).getTime();
+      if (diff > 0) {
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        num = String(d);
+        resto = `${d === 1 ? "día" : "días"} · ${String(h).padStart(2, "0")} h ${String(m).padStart(2, "0")} m`;
+        clase = "";
+      } else if (objDia === hoy0) {
+        num = "Hoy"; resto = "¡es el día!"; clase = "";
+      } else {
+        resto = "Ya pasó";
+      }
+    }
+    return `<div class="cuenta${clase}" style="--rgb:${f.rgb}"><div class="cuenta-num">${num}</div><div class="cuenta-info"><span class="cuenta-nombre">${esc(f.nombre)}</span><span class="cuenta-resto">${resto}</span></div></div>`;
+  }).join("");
+}
+
+/* ---------- Notitas ---------- */
+function construirNotas() {
+  $("#notasLista").innerHTML = IDS_NOTAS.map((id, i) =>
+    `<div class="nota" style="--rgb:${COLORES_NOTAS[i]}"><textarea data-nota="${id}" rows="3" maxlength="600" placeholder="Nota…" aria-label="Nota ${i + 1}"></textarea></div>`
+  ).join("");
+  pintarNotas();
+}
+function pintarNotas() {
+  document.querySelectorAll("#notasLista textarea").forEach((t) => {
+    if (document.activeElement === t) return;           // no pisar lo que estás escribiendo
+    const v = notas[t.dataset.nota] || "";
+    if (t.value !== v) t.value = v;
+  });
+}
+function enviarNota(id) {
+  pendientesNotas.delete(id);
+  if (!db || !codigo) return;
+  setDoc(doc(db, COLECCION, codigo), { notas: { [id]: notas[id] || "" } }, { merge: true }).catch(falloSync);
+}
+function enviarNotasPendientes() { [...pendientesNotas].forEach((id) => { clearTimeout(timersNotas[id]); enviarNota(id); }); }
+
 /* ---------- Hoja de selección ---------- */
 function abrirSheetDia(sid) {
   const s = sesionPorId(sid);
@@ -627,6 +792,8 @@ function ocultarToast() { $("#toast").classList.remove("visible"); toastUndo = n
 /* ---------- Pantallas ---------- */
 function mostrarPantallaCodigo(permitirCancelar) {
   $("#vistaApp").hidden = true;
+  $("#lateralIzq").hidden = true;
+  $("#lateralDer").hidden = true;
   $("#vistaCodigo").hidden = false;
   $("#cancelarCodigo").hidden = !permitirCancelar;
   $("#errorCodigo").textContent = "";
@@ -636,7 +803,11 @@ function mostrarPantallaCodigo(permitirCancelar) {
 function mostrarApp() {
   $("#vistaCodigo").hidden = true;
   $("#vistaApp").hidden = false;
+  $("#lateralIzq").hidden = false;
+  $("#lateralDer").hidden = false;
   render();
+  renderFechas();
+  construirNotas();
 }
 
 /* ---------- Eventos ---------- */
@@ -696,6 +867,24 @@ $("#formCodigo").addEventListener("submit", (e) => {
   suscribir();
 });
 
+// Notitas: guardan solas al escribir y al salir del cuadro
+$("#notasLista").addEventListener("input", (e) => {
+  const t = e.target.closest("textarea[data-nota]");
+  if (!t) return;
+  const id = t.dataset.nota;
+  notas[id] = t.value;
+  pendientesNotas.add(id);
+  guardarCacheNotas();
+  clearTimeout(timersNotas[id]);
+  timersNotas[id] = setTimeout(() => enviarNota(id), 700);
+});
+$("#notasLista").addEventListener("focusout", (e) => {
+  const t = e.target.closest("textarea[data-nota]");
+  if (!t) return;
+  clearTimeout(timersNotas[t.dataset.nota]);
+  if (pendientesNotas.has(t.dataset.nota)) enviarNota(t.dataset.nota);
+});
+
 // Conexión
 window.addEventListener("offline", () => { if (db && codigo) setEstado("offline"); });
 window.addEventListener("online", () => { if (db && codigo && estadoActual === "offline") setEstado("conectando"); });
@@ -709,9 +898,12 @@ function revisarFecha() {
     hoyStr = h;
     if (!$("#vistaApp").hidden) render();
   }
+  if (!$("#lateralIzq").hidden) renderFechas();     // actualiza los contadores
 }
 setInterval(revisarFecha, 30000);
-document.addEventListener("visibilitychange", () => { if (!document.hidden) revisarFecha(); });
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) enviarNotasPendientes(); else revisarFecha();
+});
 
 /* ---------- Inicio ---------- */
 (function iniciar() {
