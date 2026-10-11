@@ -498,7 +498,7 @@ if (firebaseListo) {
 /* ---------- Estado ---------- */
 const params = new URLSearchParams(location.search);
 let codigo = null;
-let semanas = {};                       // { "2026-10-04": { pierna: 2, ... } }
+let semanas = {};                       // solo la semana en curso: { "2026-10-11": { pierna: 2, ... } }
 let semanaKey = claveSemana(new Date());
 let hoyStr = new Date().toDateString();
 let desuscribir = null;
@@ -531,7 +531,21 @@ function guardarCacheNotas() { if (codigo) ls.set(LS_NOTAS + codigo, JSON.string
 function cargarCache() {
   try { semanas = JSON.parse(ls.get(LS_CACHE + codigo) || "{}") || {}; } catch { semanas = {}; }
   try { notas = JSON.parse(ls.get(LS_NOTAS + codigo) || "{}") || {}; } catch { notas = {}; }
+  // Solo se conserva la semana en curso: lo de semanas anteriores se descarta
+  for (const k of Object.keys(semanas)) if (k !== semanaKey) delete semanas[k];
   pendientesNotas.clear();
+}
+
+/* ---------- Reinicio semanal: borra todo lo que no sea la semana en curso ---------- */
+function limpiarSemanasViejas() {
+  const viejas = Object.keys(semanas).filter((k) => k !== semanaKey);
+  if (!viejas.length) return;
+  viejas.forEach((k) => delete semanas[k]);
+  guardarCache();
+  if (!db || !codigo) return;
+  const obj = {};
+  viejas.forEach((k) => (obj[k] = deleteField()));
+  setDoc(doc(db, COLECCION, codigo), { semanas: obj }, { merge: true }).catch(falloSync);
 }
 
 /* ---------- Estado de sincronización ---------- */
@@ -606,6 +620,7 @@ function suscribir() {
     }
     const datos = snap.data();
     semanas = datos.semanas || {};
+    limpiarSemanasViejas();                               // reinicio semanal: descarta (y borra del servidor) semanas anteriores
     const remotas = datos.notas || {};
     IDS_NOTAS.forEach((id) => {
       if (!pendientesNotas.has(id)) notas[id] = typeof remotas[id] === "string" ? remotas[id] : "";
@@ -911,8 +926,10 @@ function revisarFecha() {
   const k = claveSemana(new Date());
   const h = new Date().toDateString();
   if (k !== semanaKey || h !== hoyStr) {
+    const cambioSemana = k !== semanaKey;
     semanaKey = k;
     hoyStr = h;
+    if (cambioSemana) limpiarSemanasViejas();          // domingo: arranca de cero y se borra la semana anterior
     if (!$("#vistaApp").hidden) render();
   }
   if (!$("#lateralIzq").hidden) renderFechas();     // actualiza los contadores
