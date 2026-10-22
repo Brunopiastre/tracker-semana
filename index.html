@@ -431,7 +431,7 @@ const ID_BASE_DE_DATOS = "(default)";
    el archivo, poné acá tu código entre las comillas (mínimo 8
    caracteres: letras, números, guion y guion bajo).
    ===================================================================== */
-const CODIGO_FIJO = "";
+const CODIGO_FIJO = "rutina-w9i63tk1dccgvmlpvkni";
 /* ===================================================================== */
 
 const COLECCION = "seguimiento";
@@ -996,7 +996,7 @@ document.addEventListener("visibilitychange", () => {
     if (urlOk.ok) ls.set(LS_CODIGO, urlOk.valor);
   }
   const fijo = CODIGO_FIJO ? normalizarCodigo(CODIGO_FIJO) : { ok: false };
-  if (fijo.ok) $("#btnCambiarCodigo").hidden = true;      // con código fijo no hay nada que cambiar
+  if (fijo.ok) { $("#btnCambiarCodigo").hidden = true; $("#btnLively").hidden = true; }      // con código fijo no hay nada que cambiar
   const guardado = ls.get(LS_CODIGO);
   // Prioridad: código fijo > código de la URL (no depende del almacenamiento) > código guardado
   const r = fijo.ok ? fijo : (urlOk.ok ? urlOk : (guardado ? normalizarCodigo(guardado) : { ok: false }));
