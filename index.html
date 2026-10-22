@@ -300,6 +300,21 @@ html:not(.fondo) .lateral { display: none; }
 html.fondo .sheet { position: absolute; align-items: center; }
 html.fondo .sheet-card { border-radius: 1rem; margin: 1rem; width: auto; border-bottom: 1px solid var(--borde); padding-bottom: 1rem; }
 
+/* ===== Editor de fechas ===== */
+.fila-fecha { display: grid; grid-template-columns: 1fr 9.5rem auto; gap: 0.4rem; margin-bottom: 0.5rem; align-items: center; }
+.fila-fecha input {
+  width: 100%; min-width: 0; padding: 0.6rem 0.7rem; border-radius: 0.7rem;
+  background: var(--superficie); border: 1px solid var(--borde);
+  color: var(--texto); font: inherit; font-size: 0.95rem;
+}
+.f-quitar { background: transparent; border: 1px solid var(--borde); color: var(--peligro); border-radius: 0.6rem; padding: 0.5rem 0.65rem; }
+#agregarFecha { margin-top: 0.2rem; }
+@media (max-width: 420px) {
+  .fila-fecha { grid-template-columns: 1fr auto; }
+  .fila-fecha .f-fecha { grid-column: 1; }
+  .f-quitar { grid-row: 1 / 3; grid-column: 2; }
+}
+
 /* ===== Aviso con deshacer ===== */
 .toast {
   position: fixed; left: 50%; bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); z-index: 30;
@@ -358,6 +373,7 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
 
       <div class="pie">
         <button type="button" class="btn-sec" id="btnReset">Reiniciar semana</button>
+        <button type="button" class="btn-sec" id="btnFechas">Editar fechas</button>
         <button type="button" class="link" id="btnCambiarCodigo">Cambiar código</button>
         <button type="button" class="link" id="btnLively">Link para Lively</button>
         <span class="estado" id="estado" data-e="local"><i></i><b id="estadoTexto" style="font-weight:500"></b></span>
@@ -373,6 +389,19 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
       <h2 id="sheetTitulo"></h2>
       <div id="sheetOpciones"></div>
       <button type="button" class="cancelar" id="sheetCancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Editor de fechas importantes -->
+  <div class="sheet" id="sheetFechas" role="dialog" aria-modal="true" aria-labelledby="tituloFechas">
+    <div class="sheet-card">
+      <h2 id="tituloFechas">Fechas importantes</h2>
+      <div id="listaEditorFechas"></div>
+      <button type="button" class="btn-sec" id="agregarFecha">+ Agregar fecha</button>
+      <div class="acciones" style="margin-top:1rem">
+        <button type="button" class="btn-principal" id="guardarFechas">Guardar</button>
+        <button type="button" class="btn-sec" id="cancelarFechas">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -460,12 +489,17 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "o
    "2026-12-15T09:30"). Con fecha: "" muestra "Sin fecha".
    Podés agregar o quitar líneas libremente.
    ===================================================================== */
-const FECHAS = [
+const FECHAS_BASE = [
   { nombre: "2º parcial de Física",    fecha: "2026-11-02", rgb: "92 200 242" },
   { nombre: "Recuperatorio de Física", fecha: "2026-11-09", rgb: "245 168 90" },
   { nombre: "Teleinformática",         fecha: "2026-11-23", rgb: "169 139 245" },
   { nombre: "Viaje",                   fecha: "2026-12-17", rgb: "79 209 165" }
 ];
+
+let listaFechas = FECHAS_BASE.map((f) => ({ ...f }));   // lista actual (editable desde la página)
+const LS_FECHAS = "tracker_fechas_";
+const COLORES_FECHAS = ["92 200 242", "245 168 90", "169 139 245", "79 209 165", "240 113 107", "245 208 120", "79 140 245", "240 150 170"];
+const MAX_FECHAS = 8;
 
 // Notitas (columna derecha): una por color. Agregá o quitá colores para cambiar la cantidad.
 const COLORES_NOTAS = ["245 208 120", "120 220 190", "240 150 170", "160 190 250", "200 160 245"];
@@ -561,12 +595,25 @@ const pendientesNotas = new Set();       // notas con cambios locales todavía n
 const timersNotas = {};
 
 function guardarCache() { if (codigo) ls.set(LS_CACHE + codigo, JSON.stringify(semanas)); }
+function guardarCacheFechas() { if (codigo) ls.set(LS_FECHAS + codigo, JSON.stringify(listaFechas)); }
+function sanearFechas(arr) {
+  if (!Array.isArray(arr)) return null;
+  return arr.slice(0, MAX_FECHAS).map((f, i) => ({
+    nombre: String((f && f.nombre) || "").trim().slice(0, 40),
+    fecha: /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test((f && f.fecha) || "") ? f.fecha : "",
+    rgb: COLORES_FECHAS.includes(f && f.rgb) ? f.rgb : COLORES_FECHAS[i % COLORES_FECHAS.length]
+  })).filter((f) => f.nombre);
+}
 function guardarCacheNotas() { if (codigo) ls.set(LS_NOTAS + codigo, JSON.stringify(notas)); }
 function cargarCache() {
   try { semanas = JSON.parse(ls.get(LS_CACHE + codigo) || "{}") || {}; } catch { semanas = {}; }
   try { notas = JSON.parse(ls.get(LS_NOTAS + codigo) || "{}") || {}; } catch { notas = {}; }
   // Solo se conserva la semana en curso: lo de semanas anteriores se descarta
   for (const k of Object.keys(semanas)) if (k !== semanaKey) delete semanas[k];
+  try {
+    const f = sanearFechas(JSON.parse(ls.get(LS_FECHAS + codigo) || "null"));
+    listaFechas = f || FECHAS_BASE.map((x) => ({ ...x }));
+  } catch { listaFechas = FECHAS_BASE.map((x) => ({ ...x })); }
   pendientesNotas.clear();
 }
 
@@ -592,6 +639,7 @@ const TEXTOS_ESTADO = {
   error: "Error al sincronizar"
 };
 let estadoActual = "local";
+let avisoFechasTexto = "";
 const AYUDAS_ERROR = {
   "permission-denied": "Firebase rechazó el acceso. Revisá que las reglas de Firestore estén publicadas (permitiendo los campos semanas y notas) y que tu código tenga 8 o más caracteres.",
   "not-found": "No se encontró la base de datos. Revisá que esté creada y que su ID sea el mismo que ID_BASE_DE_DATOS en el archivo.",
@@ -607,6 +655,9 @@ function setEstado(e, detalle) {
   const aviso = $("#avisoError");
   if (e === "error") {
     aviso.textContent = AYUDAS_ERROR[detalle] || `Código del error: ${detalle || "desconocido"}. Pasáselo a Claude para resolverlo.`;
+    aviso.hidden = false;
+  } else if (avisoFechasTexto) {
+    aviso.textContent = avisoFechasTexto;
     aviso.hidden = false;
   } else {
     aviso.hidden = true;
@@ -655,6 +706,7 @@ function suscribir() {
     const datos = snap.data();
     semanas = datos.semanas || {};
     limpiarSemanasViejas();                               // reinicio semanal: descarta (y borra del servidor) semanas anteriores
+    if (Array.isArray(datos.fechas)) { listaFechas = sanearFechas(datos.fechas) || listaFechas; guardarCacheFechas(); }
     const remotas = datos.notas || {};
     IDS_NOTAS.forEach((id) => {
       if (!pendientesNotas.has(id)) notas[id] = typeof remotas[id] === "string" ? remotas[id] : "";
@@ -663,6 +715,7 @@ function suscribir() {
     guardarCacheNotas();
     render();
     pintarNotas();
+    renderFechas();
     if (snap.metadata.hasPendingWrites) setEstado("pendiente");
     else if (snap.metadata.fromCache) setEstado(navigator.onLine ? "conectando" : "offline");
     else setEstado("ok");
@@ -761,7 +814,11 @@ function objetivoFecha(txt) {
 function renderFechas() {
   const ahora = new Date();
   const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
-  $("#fechasLista").innerHTML = FECHAS.map((f) => {
+  if (!listaFechas.length) {
+    $("#fechasLista").innerHTML = '<div class="cuenta vacia"><div class="cuenta-num">—</div><div class="cuenta-info"><span class="cuenta-nombre">Sin fechas</span><span class="cuenta-resto">Tocá "Editar fechas"</span></div></div>';
+    return;
+  }
+  $("#fechasLista").innerHTML = listaFechas.map((f) => {
     const obj = objetivoFecha(f.fecha);
     let num = "—", resto = "Sin fecha", clase = " vacia";
     if (obj) {
@@ -804,6 +861,52 @@ function enviarNota(id) {
   setDoc(doc(db, COLECCION, codigo), { notas: { [id]: notas[id] || "" } }, { merge: true }).catch(falloSync);
 }
 function enviarNotasPendientes() { [...pendientesNotas].forEach((id) => { clearTimeout(timersNotas[id]); enviarNota(id); }); }
+
+/* ---------- Editor de fechas importantes ---------- */
+let borrador = [];
+function filaFechaHTML(f, i) {
+  return `<div class="fila-fecha"><input type="text" class="f-nombre" maxlength="40" placeholder="Nombre (ej. Parcial de Física)" value="${esc(f.nombre)}" aria-label="Nombre"><input type="date" class="f-fecha" value="${esc((f.fecha || "").slice(0, 10))}" aria-label="Fecha"><button type="button" class="f-quitar" data-accion="quitar-fecha" data-i="${i}" aria-label="Quitar">✕</button></div>`;
+}
+function leerFilasFechas() {
+  return [...document.querySelectorAll("#listaEditorFechas .fila-fecha")].map((el, i) => ({
+    nombre: el.querySelector(".f-nombre").value,
+    fecha: el.querySelector(".f-fecha").value,
+    rgb: (borrador[i] && borrador[i].rgb) || COLORES_FECHAS[i % COLORES_FECHAS.length]
+  }));
+}
+function pintarEditorFechas() {
+  $("#listaEditorFechas").innerHTML = borrador.map(filaFechaHTML).join("");
+  $("#agregarFecha").hidden = borrador.length >= MAX_FECHAS;
+}
+function abrirEditorFechas() {
+  borrador = listaFechas.map((f) => ({ ...f }));
+  pintarEditorFechas();
+  $("#sheetFechas").classList.add("abierto");
+}
+function cerrarEditorFechas() { $("#sheetFechas").classList.remove("abierto"); }
+function falloFechas(err) {
+  console.error(err);
+  const c = err && err.code ? String(err.code).replace("firestore/", "") : "desconocido";
+  avisoFechasTexto = c === "permission-denied"
+    ? "Las fechas quedaron guardadas en este dispositivo, pero Firebase no deja sincronizarlas: en las reglas de Firestore hay que permitir también el campo fechas."
+    : `Las fechas quedaron guardadas en este dispositivo, pero no se pudieron sincronizar (${c}).`;
+  const a = $("#avisoError");
+  a.textContent = avisoFechasTexto;
+  a.hidden = false;
+}
+function guardarFechas() {
+  const lista = sanearFechas(leerFilasFechas()) || [];
+  lista.sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999"));
+  listaFechas = lista;
+  guardarCacheFechas();
+  renderFechas();
+  cerrarEditorFechas();
+  mostrarToast("Fechas guardadas");
+  if (!db || !codigo) return;
+  setDoc(doc(db, COLECCION, codigo), { fechas: lista }, { merge: true })
+    .then(() => { if (avisoFechasTexto) { avisoFechasTexto = ""; $("#avisoError").hidden = estadoActual !== "error"; } })
+    .catch(falloFechas);
+}
 
 /* ---------- Hoja de selección ---------- */
 function abrirSheetDia(sid) {
@@ -891,6 +994,25 @@ document.addEventListener("click", (e) => {
 });
 
 $("#sheetCancelar").addEventListener("click", cerrarSheet);
+$("#btnFechas").addEventListener("click", abrirEditorFechas);
+$("#cancelarFechas").addEventListener("click", cerrarEditorFechas);
+$("#guardarFechas").addEventListener("click", guardarFechas);
+$("#sheetFechas").addEventListener("click", (e) => { if (e.target === $("#sheetFechas")) cerrarEditorFechas(); });
+$("#agregarFecha").addEventListener("click", () => {
+  borrador = leerFilasFechas();
+  borrador.push({ nombre: "", fecha: "", rgb: COLORES_FECHAS[borrador.length % COLORES_FECHAS.length] });
+  pintarEditorFechas();
+  const inputs = document.querySelectorAll("#listaEditorFechas .f-nombre");
+  if (inputs.length) inputs[inputs.length - 1].focus();
+});
+$("#listaEditorFechas").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-accion=quitar-fecha]");
+  if (!b) return;
+  borrador = leerFilasFechas();
+  borrador.splice(Number(b.dataset.i), 1);
+  pintarEditorFechas();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarEditorFechas(); });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarSheet(); });
 
 $("#toastDeshacer").addEventListener("click", () => {
