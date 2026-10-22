@@ -359,6 +359,7 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
       <div class="pie">
         <button type="button" class="btn-sec" id="btnReset">Reiniciar semana</button>
         <button type="button" class="link" id="btnCambiarCodigo">Cambiar código</button>
+        <button type="button" class="link" id="btnLively">Link para Lively</button>
         <span class="estado" id="estado" data-e="local"><i></i><b id="estadoTexto" style="font-weight:500"></b></span>
       </div>
       <p class="aviso-error" id="avisoError" hidden></p>
@@ -395,11 +396,18 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
 </aside>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {
-  initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager,
-  doc, onSnapshot, setDoc, deleteField
-} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+// Firebase se carga con protección: si algo lo bloquea, la página igual se muestra (modo local)
+let initializeApp, initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager,
+    doc, onSnapshot, setDoc, deleteField;
+let firebaseCargado = false;
+try {
+  ({ initializeApp } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js"));
+  ({ initializeFirestore, getFirestore, persistentLocalCache, persistentMultipleTabManager,
+     doc, onSnapshot, setDoc, deleteField } = await import("https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js"));
+  firebaseCargado = true;
+} catch (e) {
+  console.error("No se pudo cargar Firebase:", e);
+}
 
 /* =====================================================================
    CONFIGURACIÓN DE FIREBASE  ->  reemplazá este bloque con el tuyo
@@ -418,12 +426,12 @@ const FIREBASE_CONFIG = {
 const ID_BASE_DE_DATOS = "(default)";
 
 /* =====================================================================
-   CÓDIGO FIJO  ->  reemplazá TU-CODIGO-AQUI (incluidos los < >) por tu
-   código real, entre las comillas. Mínimo 8 caracteres, solo letras,
-   números, guion (-) y guion bajo (_). Ejemplo: "bruno-fuerte-2026"
-   Mientras tenga los < >, la página lo ignora y lo pide como antes.
+   CÓDIGO FIJO (OPCIONAL)  ->  dejalo vacío ("") y usá la pantalla de la
+   página: lo escribís una vez y queda guardado. Si preferís dejarlo en
+   el archivo, poné acá tu código entre las comillas (mínimo 8
+   caracteres: letras, números, guion y guion bajo).
    ===================================================================== */
-const CODIGO_FIJO = "<TU-CODIGO-AQUI>";
+const CODIGO_FIJO = "";
 /* ===================================================================== */
 
 const COLECCION = "seguimiento";
@@ -472,9 +480,27 @@ const $ = (s) => document.querySelector(s);
 const sesionPorId = (id) => SESIONES.find((s) => s.id === id);
 
 /* ---------- Almacenamiento local (con protección por si falla) ---------- */
+// El código se guarda en localStorage Y en una cookie de respaldo (por si el navegador de Lively limpia uno de los dos)
+function leerCookie() {
+  try {
+    const m = document.cookie.match(/(?:^|;\s*)tracker_codigo=([^;]*)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  } catch { return null; }
+}
+function escribirCookie(v) {
+  try { document.cookie = `tracker_codigo=${encodeURIComponent(v)}; max-age=31536000; path=/; SameSite=Lax`; } catch {}
+}
 const ls = {
-  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
+  get(k) {
+    let v = null;
+    try { v = localStorage.getItem(k); } catch {}
+    if (v === null && k === LS_CODIGO) v = leerCookie();
+    return v;
+  },
+  set(k, v) {
+    try { localStorage.setItem(k, v); } catch {}
+    if (k === LS_CODIGO) escribirCookie(v);
+  }
 };
 
 /* ---------- Fechas ---------- */
@@ -488,7 +514,7 @@ function fechasSemana(clave) {
 }
 
 /* ---------- Firebase ---------- */
-const firebaseListo = !Object.values(FIREBASE_CONFIG).some((v) => !v || String(v).includes("PEGAR"));
+const firebaseListo = firebaseCargado && !Object.values(FIREBASE_CONFIG).some((v) => !v || String(v).includes("PEGAR"));
 let db = null;
 if (firebaseListo) {
   try {
@@ -895,6 +921,19 @@ $("#btnReset").addEventListener("click", () => {
 });
 
 $("#btnCambiarCodigo").addEventListener("click", () => mostrarPantallaCodigo(true));
+// Copia el link del modo fondo con el código incluido: pegalo en Lively y nunca más lo pide
+$("#btnLively").addEventListener("click", async () => {
+  if (!codigo) return;
+  const url = `${location.origin}${location.pathname}?modo=fondo&codigo=${encodeURIComponent(codigo)}`;
+  try {
+    await navigator.clipboard.writeText(url);
+    mostrarToast("Link copiado. Pegalo en Lively como dirección del fondo.");
+  } catch {
+    const aviso = $("#avisoError");
+    aviso.textContent = "Copiá este link y pegalo en Lively: " + url;
+    aviso.hidden = false;
+  }
+});
 $("#cancelarCodigo").addEventListener("click", mostrarApp);
 $("#formCodigo").addEventListener("submit", (e) => {
   e.preventDefault();
@@ -951,14 +990,16 @@ document.addEventListener("visibilitychange", () => {
 (function iniciar() {
   // Atajo: ?codigo=mi-codigo-largo guarda el código (útil en Lively, que tiene su propio almacenamiento)
   const deURL = params.get("codigo");
+  let urlOk = { ok: false };
   if (deURL) {
-    const r = normalizarCodigo(deURL);
-    if (r.ok) ls.set(LS_CODIGO, r.valor);
+    urlOk = normalizarCodigo(deURL);
+    if (urlOk.ok) ls.set(LS_CODIGO, urlOk.valor);
   }
   const fijo = CODIGO_FIJO ? normalizarCodigo(CODIGO_FIJO) : { ok: false };
   if (fijo.ok) $("#btnCambiarCodigo").hidden = true;      // con código fijo no hay nada que cambiar
   const guardado = ls.get(LS_CODIGO);
-  const r = fijo.ok ? fijo : (guardado ? normalizarCodigo(guardado) : { ok: false });
+  // Prioridad: código fijo > código de la URL (no depende del almacenamiento) > código guardado
+  const r = fijo.ok ? fijo : (urlOk.ok ? urlOk : (guardado ? normalizarCodigo(guardado) : { ok: false }));
   if (r.ok) {
     codigo = r.valor;
     cargarCache();
