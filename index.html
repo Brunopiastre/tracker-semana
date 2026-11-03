@@ -331,51 +331,159 @@ html.fondo .sheet-card { border-radius: 1rem; margin: 1rem; width: auto; border-
 html.fondo .toast { position: absolute; bottom: 1rem; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ===== Pestañas de vista (Estudio / Gimnasio) ===== */
+.tabs {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem;
+  padding: 0.25rem; margin-bottom: 1.1rem;
+  border-radius: 0.9rem; background: var(--superficie); border: 1px solid var(--borde);
+}
+.tab {
+  padding: 0.5rem 0.6rem; border-radius: 0.65rem; border: 0; background: transparent;
+  font-family: var(--fuente-titulo); font-size: 1.1rem; font-weight: 700; letter-spacing: 0.01em;
+  color: var(--suave);
+}
+.tab[aria-selected="true"] { background: #5cc8f2; color: #0e131b; }
+html.fondo .tabs { margin-bottom: 0.9rem; }
+
+/* ===== Estudio ===== */
+.contador.est { font-size: 2rem; text-align: right; white-space: nowrap; }
+.barra { height: 0.55rem; border-radius: 99px; background: var(--superficie); margin-top: 0.9rem; overflow: hidden; }
+.barra i { display: block; height: 100%; width: 0; border-radius: 99px; background: #4fd1a5; transition: width 0.4s; }
+.est-resumen { margin: 0.85rem 0 0; font-size: 0.95rem; line-height: 1.4; color: var(--texto); }
+.est-resumen b { font-weight: 650; color: #5cc8f2; }
+.est-resumen.ok b { color: #4fd1a5; }
+.est-meta { display: block; margin-top: 0.2rem; }
+
+/* ===== Hoja para cargar horas ===== */
+.ayuda-horas { margin: 0 0 0.8rem; color: var(--suave); font-size: 0.9rem; line-height: 1.4; }
+#inputHoras {
+  width: 100%; padding: 0.8rem 0.9rem; border-radius: 0.8rem;
+  background: var(--superficie); border: 1px solid var(--borde);
+  color: var(--texto); font: inherit; font-size: 1.1rem;
+}
+.presets { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.7rem; }
+.preset {
+  padding: 0.4rem 0.75rem; border-radius: 999px;
+  border: 1px solid var(--borde); background: var(--superficie); font-size: 0.9rem;
+}
+
+/* ===== Estudio: versión compacta y tranquila ===== */
+html.fondo.v-estudio .panel { width: 21rem; }
+html.fondo.v-estudio .contenido { padding: 0.9rem 1rem 0.8rem; }
+html.v-estudio .tabs { margin-bottom: 0.9rem; }
+#bloqueEstudio h1 { font-size: 1.5rem; }
+#bloqueEstudio .rango { font-size: 0.78rem; }
+.contador.est { font-size: 1.5rem; }
+.contador.est small { font-size: 0.85rem; }
+.barra { height: 0.35rem; margin-top: 0.7rem; }
+.est-resumen { font-size: 0.85rem; margin-top: 0.65rem; }
+.est-meta { font-size: 0.78rem; }
+.est-lista { display: grid; gap: 0.4rem; margin-top: 0.9rem; }
+.est-fila { display: grid; grid-template-columns: 2.8rem 1fr 4.4rem; gap: 0.5rem; align-items: center; }
+.est-fila .dia-nombre { font-size: 1.05rem; }
+.est-fila .dia-fecha { font-size: 0.68rem; }
+.est-fila.hoy .dia-nombre, .est-fila.hoy .dia-fecha { color: #5cc8f2; }
+.est-campo {
+  display: flex; align-items: center; gap: 0.35rem;
+  padding: 0.35rem 0.7rem; border-radius: 0.7rem;
+  background: var(--superficie); border: 1px solid var(--borde);
+  transition: border-color 0.2s, background 0.2s;
+}
+.est-campo:focus-within { border-color: #5cc8f2; }
+.est-input {
+  flex: 1; min-width: 0; width: 100%; padding: 0.1rem 0; border: 0; background: transparent;
+  color: var(--texto); font-family: var(--fuente-titulo); font-size: 1.15rem; font-weight: 600;
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.est-input::placeholder { color: var(--suave); opacity: 0.75; font-weight: 500; }
+.est-input:focus-visible { outline: none; }
+.est-h { color: var(--suave); font-size: 0.8rem; }
+.est-campo.ok { border-color: rgb(79 209 165 / 0.55); background: rgb(79 209 165 / 0.09); }
+.est-campo.falto { border-color: rgb(245 168 90 / 0.55); background: rgb(245 168 90 / 0.09); }
+.est-campo.error { border-color: var(--peligro); }
+.est-estado { font-size: 0.72rem; line-height: 1.15; color: var(--suave); }
+.est-estado.ok { color: #4fd1a5; }
+.est-estado.falto { color: #f5a85a; }
+.est-ayuda { margin: 0.8rem 0 0; font-size: 0.72rem; line-height: 1.4; color: var(--suave); }
+
+/* ===== Extras ===== */
+.cuenta.urg7 .cuenta-num { color: #f5a85a; }
+.cuenta.urg3 .cuenta-num { color: #f0716b; }
+.est-sub { display: block; margin-top: 0.2rem; color: var(--suave); font-size: 0.78rem; }
+
+/* ===== Por materia ===== */
+.mat-titulo { font-size: 0.95rem; margin: 1.1rem 0 0.5rem; }
+.mat-titulo span { margin-left: auto; font-size: 0.72rem; color: var(--suave); }
+.mat-titulo span.alerta { color: #f5a85a; }
+.mat-barra { display: flex; height: 0.35rem; border-radius: 99px; background: var(--superficie); overflow: hidden; margin-bottom: 0.6rem; }
+.mat-barra i { display: block; height: 100%; background: rgb(var(--rgb)); transition: width 0.3s; }
+.mat-lista { display: grid; gap: 0.35rem; }
+.mat-fila { display: grid; grid-template-columns: 1fr 5.4rem; gap: 0.5rem; align-items: center; }
+.mat-nombre { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; min-width: 0; }
+.mat-punto { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: rgb(var(--rgb)); flex: none; }
+.mat-fila .est-campo { padding: 0.25rem 0.6rem; }
+.mat-fila .est-input { font-size: 1rem; }
 </style>
 </head>
 <body>
 <main class="panel" id="panel">
   <div class="contenido">
 
-    <!-- Pantalla para ingresar el código -->
-    <section id="vistaCodigo" hidden>
-      <h1>Tu código personal</h1>
-      <p class="ayuda">Escribilo igual en el celular y en la compu: el mismo código muestra la misma semana. Elegí uno largo y difícil de adivinar.</p>
-      <form id="formCodigo" novalidate>
-        <input id="inputCodigo" type="text" placeholder="ej. bruno-fuerte-2026" maxlength="64"
-               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Código personal">
-        <p class="error" id="errorCodigo" role="alert"></p>
-        <div class="acciones">
-          <button type="submit" class="btn-principal">Guardar código</button>
-          <button type="button" class="btn-sec" id="cancelarCodigo" hidden>Cancelar</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Tracker -->
     <section id="vistaApp" hidden>
-      <header>
-        <div class="encabezado">
-          <div>
-            <h1>Esta semana</h1>
-            <p class="rango" id="rango"></p>
+
+      <!-- Cambiar entre fondo de estudio y de gimnasio -->
+      <div class="tabs" role="tablist" aria-label="Vista del fondo">
+        <button type="button" class="tab" role="tab" id="tabEstudio" data-accion="vista" data-vista="estudio" aria-selected="true">Estudio</button>
+        <button type="button" class="tab" role="tab" id="tabGym" data-accion="vista" data-vista="gym" aria-selected="false">Gimnasio</button>
+      </div>
+
+      <!-- ============ ESTUDIO ============ -->
+      <div id="bloqueEstudio" hidden>
+        <header>
+          <div class="encabezado">
+            <div>
+              <h1>Estudio</h1>
+              <p class="rango" id="estRango"></p>
+            </div>
+            <div class="contador est" aria-live="polite"><span id="estHechas">0 h</span> <small id="estTotal"></small></div>
           </div>
-          <div class="contador" aria-live="polite"><span id="hechas">0</span><small>/7</small></div>
-        </div>
-        <div class="segmentos" id="segmentos" role="progressbar" aria-label="Sesiones completadas" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"></div>
-      </header>
+          <div class="barra" id="estBarraWrap" role="progressbar" aria-label="Horas de estudio de la semana" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="estBarra"></i></div>
+        </header>
+        <p class="est-resumen" id="estResumen"></p>
+        <button type="button" class="link est-meta" id="btnMeta"></button>
 
-      <div class="seccion-titulo">Días</div>
-      <div class="dias" id="dias"></div>
+        <div class="est-lista" id="estDias"></div>
+        <p class="est-ayuda">Escribí las horas que estudiaste cada día (2,5 · 2:30 · 1h30). Lo gris es lo que te toca: se recalcula solo mientras tipeás.</p>
 
-      <div class="seccion-titulo">Te falta <span id="cuentaFaltan"></span></div>
-      <div id="faltan"></div>
+        <div class="seccion-titulo mat-titulo">Por materia <span id="matResumen"></span></div>
+        <div class="mat-barra" id="matBarra"></div>
+        <div class="mat-lista" id="matLista"></div>
+      </div>
+
+      <!-- ============ GIMNASIO ============ -->
+      <div id="bloqueGym" hidden>
+        <header>
+          <div class="encabezado">
+            <div>
+              <h1>Esta semana</h1>
+              <p class="rango" id="rango"></p>
+            </div>
+            <div class="contador" aria-live="polite"><span id="hechas">0</span><small>/7</small></div>
+          </div>
+          <div class="segmentos" id="segmentos" role="progressbar" aria-label="Sesiones completadas" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"></div>
+        </header>
+
+        <div class="seccion-titulo">Días</div>
+        <div class="dias" id="dias"></div>
+
+        <div class="seccion-titulo">Te falta <span id="cuentaFaltan"></span></div>
+        <div id="faltan"></div>
+      </div>
 
       <div class="pie">
         <button type="button" class="btn-sec" id="btnReset">Reiniciar semana</button>
         <button type="button" class="btn-sec" id="btnFechas">Editar fechas</button>
-        <button type="button" class="link" id="btnCambiarCodigo">Cambiar código</button>
-        <button type="button" class="link" id="btnLively">Link para Lively</button>
         <span class="estado" id="estado" data-e="local"><i></i><b id="estadoTexto" style="font-weight:500"></b></span>
       </div>
       <p class="aviso-error" id="avisoError" hidden></p>
@@ -383,12 +491,30 @@ html.fondo .toast { position: absolute; bottom: 1rem; }
 
   </div>
 
-  <!-- Hoja para elegir día o sesión -->
+  <!-- Hoja para elegir día o sesión (gimnasio) -->
   <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitulo">
     <div class="sheet-card">
       <h2 id="sheetTitulo"></h2>
       <div id="sheetOpciones"></div>
       <button type="button" class="cancelar" id="sheetCancelar">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Hoja para cargar horas de estudio / cambiar la meta -->
+  <div class="sheet" id="sheetHoras" role="dialog" aria-modal="true" aria-labelledby="tituloHoras">
+    <div class="sheet-card">
+      <h2 id="tituloHoras"></h2>
+      <p class="ayuda-horas" id="ayudaHoras"></p>
+      <form id="formHoras" novalidate>
+        <input id="inputHoras" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false"
+               placeholder="ej. 2,5  ·  2:30  ·  1h30" aria-label="Horas">
+        <div class="presets" id="presetsHoras"></div>
+        <p class="error" id="errorHoras" role="alert"></p>
+        <div class="acciones">
+          <button type="submit" class="btn-principal">Guardar</button>
+          <button type="button" class="btn-sec" id="cancelarHoras">Cancelar</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -438,10 +564,6 @@ try {
   console.error("No se pudo cargar Firebase:", e);
 }
 
-/* =====================================================================
-   CONFIGURACIÓN DE FIREBASE  ->  reemplazá este bloque con el tuyo
-   (Firebase Console > Project settings > General > Your apps > Web app)
-   ===================================================================== */
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyBPul_mmnz9VlLEzBq-U-aiNQhEgamEcJQ",
   authDomain: "rutinagym-17929.firebaseapp.com",
@@ -450,22 +572,39 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "907152308591",
   appId: "1:907152308591:web:823ee12ba5d639a3c1509a"
 };
-
-// ID de la base de datos de Firestore. Si al crearla dejaste "(default)", no lo toques.
 const ID_BASE_DE_DATOS = "(default)";
 
 /* =====================================================================
-   CÓDIGO FIJO (OPCIONAL)  ->  dejalo vacío ("") y usá la pantalla de la
-   página: lo escribís una vez y queda guardado. Si preferís dejarlo en
-   el archivo, poné acá tu código entre las comillas (mínimo 8
-   caracteres: letras, números, guion y guion bajo).
+   Código interno: identifica tus datos en Firebase. Es el mismo en todos
+   los dispositivos, por eso la página nunca lo pide. No lo cambies o vas a
+   perder lo guardado.
+   - Gimnasio, notas y fechas viven en el documento CODIGO.
+   - Estudio (horas, meta y vista elegida) vive en CODIGO-estudio, un
+     documento aparte que usa los mismos campos permitidos por tus reglas
+     (semanas y notas), así no hace falta tocar las reglas de Firestore.
    ===================================================================== */
-const CODIGO_FIJO = "rutina-w9i63tk1dccgvmlpvkni";
-/* ===================================================================== */
-
+const CODIGO = "rutina-w9i63tk1dccgvmlpvkni";
 const COLECCION = "seguimiento";
-const LS_CODIGO = "tracker_codigo";
+const DOC_GYM = CODIGO;
+const DOC_EST = CODIGO + "-estudio";
+
 const LS_CACHE = "tracker_cache_";
+const LS_NOTAS = "tracker_notas_";
+const LS_FECHAS = "tracker_fechas_";
+const LS_EST = "tracker_estudio_";
+const LS_VISTA = "tracker_vista";
+const LS_MIGRA = "tracker_fechas_v2";   // marca: ya se cargaron los exámenes nuevos en este dispositivo
+
+const META_DEFECTO = 150;               // 2 h 30 m por día
+
+// Materias para repartir las horas de la semana (mismos colores que sus exámenes)
+const MATERIAS = [
+  { id: "fisica", nombre: "Física",           rgb: "245 168 90" },
+  { id: "tele",   nombre: "Teleinformática",  rgb: "169 139 245" },
+  { id: "infor",  nombre: "Ing. Informática", rgb: "240 150 170" },
+  { id: "segu",   nombre: "Seguridad",        rgb: "92 200 242" },
+  { id: "comp2",  nombre: "Computación 2",    rgb: "79 140 245" }
+];
 
 const SESIONES = [
   { id: "correr1",  nombre: "Correr 1", rgb: "92 200 242",  sub: "Continua ~5:00/km. Opcional: velocidad al final" },
@@ -483,61 +622,37 @@ const DIAS = [
 ];
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
-/* =====================================================================
-   FECHAS IMPORTANTES (columna izquierda del fondo)
-   Completá "nombre" y "fecha" con formato AAAA-MM-DD (hora opcional:
-   "2026-12-15T09:30"). Con fecha: "" muestra "Sin fecha".
-   Podés agregar o quitar líneas libremente.
-   ===================================================================== */
+// Fechas importantes iniciales (después se editan desde la página con "Editar fechas")
 const FECHAS_BASE = [
-  { nombre: "2º parcial de Física",    fecha: "2026-11-02", rgb: "92 200 242" },
-  { nombre: "Recuperatorio de Física", fecha: "2026-11-09", rgb: "245 168 90" },
-  { nombre: "Teleinformática",         fecha: "2026-11-23", rgb: "169 139 245" },
-  { nombre: "Viaje",                   fecha: "2026-12-17", rgb: "79 209 165" }
+  { nombre: "Seguridad Informática 2",  fecha: "2026-11-06", rgb: "92 200 242" },
+  { nombre: "Recuperatorio de Física",  fecha: "2026-11-16", rgb: "245 168 90" },
+  { nombre: "Final Ing. Informática",   fecha: "2026-11-26", rgb: "240 150 170" },
+  { nombre: "Final Teleinformática",    fecha: "2026-11-30", rgb: "169 139 245" },
+  { nombre: "Computación 2",            fecha: "2026-12-15", rgb: "79 140 245" },
+  { nombre: "Final de Física",          fecha: "2026-12-16", rgb: "240 113 107" },
+  { nombre: "Viaje",                    fecha: "2026-12-17", rgb: "79 209 165" }
 ];
-
-let listaFechas = FECHAS_BASE.map((f) => ({ ...f }));   // lista actual (editable desde la página)
-const LS_FECHAS = "tracker_fechas_";
+let listaFechas = FECHAS_BASE.map((f) => ({ ...f }));
 const COLORES_FECHAS = ["92 200 242", "245 168 90", "169 139 245", "79 209 165", "240 113 107", "245 208 120", "79 140 245", "240 150 170"];
 const MAX_FECHAS = 8;
 
-// Notitas (columna derecha): una por color. Agregá o quitá colores para cambiar la cantidad.
+// Notitas (columna derecha): una por color.
 const COLORES_NOTAS = ["245 208 120", "120 220 190", "240 150 170", "160 190 250", "200 160 245"];
 const IDS_NOTAS = COLORES_NOTAS.map((_, i) => "n" + (i + 1));
-const LS_NOTAS = "tracker_notas_";
 
-const ICONO_CHECK = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg>';
-const ICONO_X = '<svg class="quitar" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8"/></svg>';
 const ICONO_MAS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 3v10M3 8h10"/></svg>';
 
 const $ = (s) => document.querySelector(s);
 const sesionPorId = (id) => SESIONES.find((s) => s.id === id);
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /* ---------- Almacenamiento local (con protección por si falla) ---------- */
-// El código se guarda en localStorage Y en una cookie de respaldo (por si el navegador de Lively limpia uno de los dos)
-function leerCookie() {
-  try {
-    const m = document.cookie.match(/(?:^|;\s*)tracker_codigo=([^;]*)/);
-    return m ? decodeURIComponent(m[1]) : null;
-  } catch { return null; }
-}
-function escribirCookie(v) {
-  try { document.cookie = `tracker_codigo=${encodeURIComponent(v)}; max-age=31536000; path=/; SameSite=Lax`; } catch {}
-}
 const ls = {
-  get(k) {
-    let v = null;
-    try { v = localStorage.getItem(k); } catch {}
-    if (v === null && k === LS_CODIGO) v = leerCookie();
-    return v;
-  },
-  set(k, v) {
-    try { localStorage.setItem(k, v); } catch {}
-    if (k === LS_CODIGO) escribirCookie(v);
-  }
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} }
 };
 
-/* ---------- Fechas ---------- */
+/* ---------- Fechas de la semana ---------- */
 function claveSemana(d) {
   const x = new Date(d.getFullYear(), d.getMonth(), d.getDate() - d.getDay()); // domingo
   return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`;
@@ -545,6 +660,12 @@ function claveSemana(d) {
 function fechasSemana(clave) {
   const [y, m, d] = clave.split("-").map(Number);
   return Array.from({ length: 7 }, (_, i) => new Date(y, m - 1, d + i));
+}
+function textoRango(fechas) {
+  const f0 = fechas[0], f6 = fechas[6];
+  return f0.getMonth() === f6.getMonth()
+    ? `${f0.getDate()} – ${f6.getDate()} ${MESES[f6.getMonth()]}`
+    : `${f0.getDate()} ${MESES[f0.getMonth()]} – ${f6.getDate()} ${MESES[f6.getMonth()]}`;
 }
 
 /* ---------- Firebase ---------- */
@@ -565,19 +686,22 @@ if (firebaseListo) {
 
 /* ---------- Estado ---------- */
 const params = new URLSearchParams(location.search);
-let codigo = null;
-let semanas = {};                       // solo la semana en curso: { "2026-10-11": { pierna: 2, ... } }
+// ?vista=estudio o ?vista=gym fija la vista en ese dispositivo. Sin eso, se usa la que elegiste (se sincroniza).
+const vistaURL = ["estudio", "gym"].includes(params.get("vista")) ? params.get("vista") : null;
+let vista = vistaURL || (["estudio", "gym"].includes(ls.get(LS_VISTA)) ? ls.get(LS_VISTA) : "estudio");
+
+let semanas = {};                       // gimnasio: { "2026-11-01": { pierna: 2, ... } }
+let notas = {};                         // { n1: "texto", ... }
+let estSemanas = {};                    // estudio: { "2026-11-01": { d0: 180, d1: 240 } } (minutos por día)
+let metaMin = META_DEFECTO;             // meta diaria de estudio, en minutos
 let semanaKey = claveSemana(new Date());
 let hoyStr = new Date().toDateString();
-let desuscribir = null;
+let desuscribirGym = null, desuscribirEst = null;
+let migrandoFechas = false;             // mientras se suben las fechas nuevas, no pisarlas con las viejas del servidor
 let ctxSheet = null;                    // { tipo: "dia", sid } | { tipo: "sesion", dia }
-
-function normalizarCodigo(texto) {
-  const limpio = String(texto || "").trim().toLowerCase().replace(/\s+/g, "");
-  if (!/^[a-z0-9_-]*$/.test(limpio)) return { ok: false, error: "Usá solo letras, números, guion (-) y guion bajo (_)." };
-  if (limpio.length < 8) return { ok: false, error: "El código necesita al menos 8 caracteres." };
-  return { ok: true, valor: limpio };
-}
+let ctxHoras = null;                    // { tipo: "dia", i } | { tipo: "meta" }
+const pendientesNotas = new Set();
+const timersNotas = {};
 
 function asignadoActual() {
   const raw = semanas[semanaKey] || {};
@@ -590,12 +714,12 @@ function asignadoActual() {
   return out;
 }
 
-let notas = {};                          // { n1: "texto", ... }
-const pendientesNotas = new Set();       // notas con cambios locales todavía no enviados
-const timersNotas = {};
-
-function guardarCache() { if (codigo) ls.set(LS_CACHE + codigo, JSON.stringify(semanas)); }
-function guardarCacheFechas() { if (codigo) ls.set(LS_FECHAS + codigo, JSON.stringify(listaFechas)); }
+/* ---------- Cachés locales ---------- */
+function guardarCache() { ls.set(LS_CACHE + CODIGO, JSON.stringify(semanas)); }
+function guardarCacheNotas() { ls.set(LS_NOTAS + CODIGO, JSON.stringify(notas)); }
+function guardarCacheFechas() { ls.set(LS_FECHAS + CODIGO, JSON.stringify(listaFechas)); }
+function guardarCacheEst() { ls.set(LS_EST + CODIGO, JSON.stringify({ semanas: estSemanas, meta: metaMin })); }
+function metaValida(n) { return Number.isInteger(n) && n >= 15 && n <= 1440; }
 function sanearFechas(arr) {
   if (!Array.isArray(arr)) return null;
   return arr.slice(0, MAX_FECHAS).map((f, i) => ({
@@ -604,16 +728,21 @@ function sanearFechas(arr) {
     rgb: COLORES_FECHAS.includes(f && f.rgb) ? f.rgb : COLORES_FECHAS[i % COLORES_FECHAS.length]
   })).filter((f) => f.nombre);
 }
-function guardarCacheNotas() { if (codigo) ls.set(LS_NOTAS + codigo, JSON.stringify(notas)); }
 function cargarCache() {
-  try { semanas = JSON.parse(ls.get(LS_CACHE + codigo) || "{}") || {}; } catch { semanas = {}; }
-  try { notas = JSON.parse(ls.get(LS_NOTAS + codigo) || "{}") || {}; } catch { notas = {}; }
-  // Solo se conserva la semana en curso: lo de semanas anteriores se descarta
-  for (const k of Object.keys(semanas)) if (k !== semanaKey) delete semanas[k];
+  try { semanas = JSON.parse(ls.get(LS_CACHE + CODIGO) || "{}") || {}; } catch { semanas = {}; }
+  try { notas = JSON.parse(ls.get(LS_NOTAS + CODIGO) || "{}") || {}; } catch { notas = {}; }
   try {
-    const f = sanearFechas(JSON.parse(ls.get(LS_FECHAS + codigo) || "null"));
+    const f = sanearFechas(JSON.parse(ls.get(LS_FECHAS + CODIGO) || "null"));
     listaFechas = f || FECHAS_BASE.map((x) => ({ ...x }));
   } catch { listaFechas = FECHAS_BASE.map((x) => ({ ...x })); }
+  try {
+    const e = JSON.parse(ls.get(LS_EST + CODIGO) || "null") || {};
+    estSemanas = e.semanas || {};
+    metaMin = metaValida(e.meta) ? e.meta : META_DEFECTO;
+  } catch { estSemanas = {}; metaMin = META_DEFECTO; }
+  // Solo se conserva la semana en curso: lo de semanas anteriores se descarta
+  for (const k of Object.keys(semanas)) if (k !== semanaKey) delete semanas[k];
+  for (const k of Object.keys(estSemanas)) if (k !== semanaKey) delete estSemanas[k];
   pendientesNotas.clear();
 }
 
@@ -623,13 +752,23 @@ function limpiarSemanasViejas() {
   if (!viejas.length) return;
   viejas.forEach((k) => delete semanas[k]);
   guardarCache();
-  if (!db || !codigo) return;
+  if (!db) return;
   const obj = {};
   viejas.forEach((k) => (obj[k] = deleteField()));
-  setDoc(doc(db, COLECCION, codigo), { semanas: obj }, { merge: true }).catch(falloSync);
+  setDoc(doc(db, COLECCION, DOC_GYM), { semanas: obj }, { merge: true }).catch(falloSync);
+}
+function limpiarEstViejas() {
+  const viejas = Object.keys(estSemanas).filter((k) => k !== semanaKey);
+  if (!viejas.length) return;
+  viejas.forEach((k) => delete estSemanas[k]);
+  guardarCacheEst();
+  if (!db) return;
+  const obj = {};
+  viejas.forEach((k) => (obj[k] = deleteField()));
+  setDoc(doc(db, COLECCION, DOC_EST), { semanas: obj }, { merge: true }).catch(falloEst);
 }
 
-/* ---------- Estado de sincronización ---------- */
+/* ---------- Estado de sincronización y avisos ---------- */
 const TEXTOS_ESTADO = {
   local: "Solo en este dispositivo",
   ok: "Sincronizado",
@@ -639,13 +778,20 @@ const TEXTOS_ESTADO = {
   error: "Error al sincronizar"
 };
 let estadoActual = "local";
-let avisoFechasTexto = "";
+const avisos = {};                       // avisos persistentes: { clave: texto }
 const AYUDAS_ERROR = {
-  "permission-denied": "Firebase rechazó el acceso. Revisá que las reglas de Firestore estén publicadas (permitiendo los campos semanas y notas) y que tu código tenga 8 o más caracteres.",
+  "permission-denied": "Firebase rechazó el acceso. Revisá que las reglas de Firestore estén publicadas (permitiendo los campos semanas y notas).",
   "not-found": "No se encontró la base de datos. Revisá que esté creada y que su ID sea el mismo que ID_BASE_DE_DATOS en el archivo.",
   "unavailable": "No se pudo conectar con Firebase. Revisá tu internet o si algún bloqueador de anuncios lo está frenando.",
   "failed-precondition": "Firestore no pudo iniciar en este navegador. Probá recargar con Ctrl + Shift + R."
 };
+function pintarAviso() {
+  if (estadoActual === "error") return;   // lo maneja setEstado
+  const t = Object.values(avisos).find(Boolean);
+  const a = $("#avisoError");
+  a.textContent = t || "";
+  a.hidden = !t;
+}
 function setEstado(e, detalle) {
   estadoActual = e;
   $("#estado").dataset.e = e;
@@ -656,20 +802,30 @@ function setEstado(e, detalle) {
   if (e === "error") {
     aviso.textContent = AYUDAS_ERROR[detalle] || `Código del error: ${detalle || "desconocido"}. Pasáselo a Claude para resolverlo.`;
     aviso.hidden = false;
-  } else if (avisoFechasTexto) {
-    aviso.textContent = avisoFechasTexto;
-    aviso.hidden = false;
   } else {
-    aviso.hidden = true;
+    pintarAviso();
   }
 }
+const codigoError = (err) => (err && err.code ? String(err.code).replace("firestore/", "") : "desconocido");
 function falloSync(err) {
   console.error(err);
-  const codigoError = err && err.code ? String(err.code).replace("firestore/", "") : "desconocido";
-  setEstado("error", codigoError);
+  setEstado("error", codigoError(err));
+}
+function falloEst(err) {
+  console.error(err);
+  avisos.est = `El estudio quedó guardado en este dispositivo, pero no se pudo sincronizar (${codigoError(err)}).`;
+  pintarAviso();
+}
+function falloFechas(err) {
+  console.error(err);
+  const c = codigoError(err);
+  avisos.fechas = c === "permission-denied"
+    ? "Las fechas quedaron guardadas en este dispositivo, pero Firebase no deja sincronizarlas: en las reglas de Firestore hay que permitir también el campo fechas."
+    : `Las fechas quedaron guardadas en este dispositivo, pero no se pudieron sincronizar (${c}).`;
+  pintarAviso();
 }
 
-/* ---------- Escritura ---------- */
+/* ---------- Escrituras: gimnasio ---------- */
 function escribir(wk, cambios) {
   const sem = { ...(semanas[wk] || {}) };
   for (const [k, v] of Object.entries(cambios)) {
@@ -678,21 +834,43 @@ function escribir(wk, cambios) {
   semanas[wk] = sem;
   guardarCache();
   render();
-  if (!db || !codigo) return;
+  if (!db) return;
   const obj = {};
   for (const [k, v] of Object.entries(cambios)) obj[k] = v === null ? deleteField() : v;
-  setDoc(doc(db, COLECCION, codigo), { semanas: { [wk]: obj } }, { merge: true })
-    .catch(falloSync);
+  setDoc(doc(db, COLECCION, DOC_GYM), { semanas: { [wk]: obj } }, { merge: true }).catch(falloSync);
 }
 
-let reintento = null;
-function suscribir() {
-  clearTimeout(reintento);
-  if (desuscribir) { desuscribir(); desuscribir = null; }
-  if (!db || !codigo) { setEstado("local"); return; }
+/* ---------- Escrituras: estudio ---------- */
+function escribirEst(wk, cambios) {
+  const sem = { ...(estSemanas[wk] || {}) };
+  for (const [k, v] of Object.entries(cambios)) {
+    if (v === null) delete sem[k]; else sem[k] = v;
+  }
+  estSemanas[wk] = sem;
+  guardarCacheEst();
+  render();
+  if (!db) return;
+  const obj = {};
+  for (const [k, v] of Object.entries(cambios)) obj[k] = v === null ? deleteField() : v;
+  setDoc(doc(db, COLECCION, DOC_EST), { semanas: { [wk]: obj } }, { merge: true })
+    .then(() => { avisos.est = ""; pintarAviso(); })
+    .catch(falloEst);
+}
+function guardarAjustesEst(cambios) {        // meta y vista: viajan en el campo "notas" del documento de estudio
+  guardarCacheEst();
+  if (!db) return;
+  setDoc(doc(db, COLECCION, DOC_EST), { notas: cambios }, { merge: true }).catch(falloEst);
+}
+
+/* ---------- Suscripciones a Firebase ---------- */
+let reintentoGym = null, reintentoEst = null;
+function suscribirGym() {
+  clearTimeout(reintentoGym);
+  if (desuscribirGym) { desuscribirGym(); desuscribirGym = null; }
+  if (!db) { setEstado("local"); return; }
   setEstado(navigator.onLine ? "conectando" : "offline");
-  const ref = doc(db, COLECCION, codigo);
-  desuscribir = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
+  const ref = doc(db, COLECCION, DOC_GYM);
+  desuscribirGym = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
     if (!snap.exists()) {
       if (snap.metadata.fromCache) return;                // todavía no sabemos: no pisar lo local
       if (Object.keys(semanas).length) {                  // el servidor no tiene nada: subir lo local
@@ -705,8 +883,8 @@ function suscribir() {
     }
     const datos = snap.data();
     semanas = datos.semanas || {};
-    limpiarSemanasViejas();                               // reinicio semanal: descarta (y borra del servidor) semanas anteriores
-    if (Array.isArray(datos.fechas)) { listaFechas = sanearFechas(datos.fechas) || listaFechas; guardarCacheFechas(); }
+    limpiarSemanasViejas();
+    if (Array.isArray(datos.fechas) && !migrandoFechas) { listaFechas = sanearFechas(datos.fechas) || listaFechas; guardarCacheFechas(); }
     const remotas = datos.notas || {};
     IDS_NOTAS.forEach((id) => {
       if (!pendientesNotas.has(id)) notas[id] = typeof remotas[id] === "string" ? remotas[id] : "";
@@ -714,26 +892,54 @@ function suscribir() {
     guardarCache();
     guardarCacheNotas();
     render();
-    pintarNotas();
     renderFechas();
+    pintarNotas();
     if (snap.metadata.hasPendingWrites) setEstado("pendiente");
     else if (snap.metadata.fromCache) setEstado(navigator.onLine ? "conectando" : "offline");
     else setEstado("ok");
   }, (err) => {
-    desuscribir = null;
+    desuscribirGym = null;
     falloSync(err);
-    reintento = setTimeout(suscribir, 15000);   // reintenta solo (sirve cuando arreglás las reglas)
+    reintentoGym = setTimeout(suscribirGym, 15000);
   });
 }
 
-/* ---------- Acciones ---------- */
+function suscribirEst() {
+  clearTimeout(reintentoEst);
+  if (desuscribirEst) { desuscribirEst(); desuscribirEst = null; }
+  if (!db) return;
+  const ref = doc(db, COLECCION, DOC_EST);
+  desuscribirEst = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
+    if (!snap.exists()) {
+      if (snap.metadata.fromCache) return;
+      if (Object.keys(estSemanas).length) {               // el servidor no tiene nada: subir lo local
+        setDoc(ref, { semanas: estSemanas, notas: { meta: String(metaMin) } }, { merge: true }).catch(falloEst);
+      }
+      return;
+    }
+    const datos = snap.data();
+    estSemanas = datos.semanas || {};
+    limpiarEstViejas();
+    const n = datos.notas || {};
+    const mm = parseInt(n.meta, 10);
+    if (metaValida(mm)) metaMin = mm;
+    if (!vistaURL && (n.vista === "estudio" || n.vista === "gym")) { vista = n.vista; ls.set(LS_VISTA, vista); }
+    guardarCacheEst();
+    render();
+  }, (err) => {
+    desuscribirEst = null;
+    falloEst(err);
+    reintentoEst = setTimeout(suscribirEst, 15000);
+  });
+}
+
+/* ---------- Acciones: gimnasio ---------- */
 function asignar(sid, dia) {
   const a = asignadoActual();
   const cambios = { [sid]: dia };
   for (const s of SESIONES) if (s.id !== sid && a[s.id] === dia) cambios[s.id] = null; // por si otro dispositivo ya la ocupó
   escribir(semanaKey, cambios);
 }
-
 function quitar(sid) {
   const wk = semanaKey;
   const dia = asignadoActual()[sid];
@@ -741,7 +947,6 @@ function quitar(sid) {
   escribir(wk, { [sid]: null });
   mostrarToast(`${sesionPorId(sid).nombre} quitada del ${DIAS[dia].nombre.toLowerCase()}`, () => escribir(wk, { [sid]: dia }));
 }
-
 function reiniciar() {
   const wk = semanaKey;
   const previo = { ...asignadoActual() };
@@ -753,17 +958,218 @@ function reiniciar() {
   mostrarToast("Semana reiniciada", () => escribir(wk, previo));
 }
 
+/* ---------- Estudio: formato, lectura y cálculo ---------- */
+function fmt(min) {
+  min = Math.max(0, Math.round(min));
+  const h = Math.floor(min / 60), m = min % 60;
+  if (!h && !m) return "0\u00a0h";
+  if (!m) return `${h}\u00a0h`;
+  if (!h) return `${m}\u00a0m`;
+  return `${h}\u00a0h\u00a0${String(m).padStart(2, "0")}\u00a0m`;
+}
+function fmtInput(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  return m ? `${h}:${String(m).padStart(2, "0")}` : String(h);
+}
+// Acepta: 2,5 · 2.5 · 2:30 · 1h30 · 1 h 30 m · 45m. Devuelve minutos, null si está vacío, NaN si no se entiende.
+function parsearHoras(txt) {
+  const t = String(txt || "").trim().toLowerCase().replace(",", ".");
+  if (!t) return null;
+  let m;
+  if ((m = t.match(/^(\d+(?:\.\d+)?)$/))) return Math.round(parseFloat(m[1]) * 60);
+  if ((m = t.match(/^(\d+):(\d{1,2})$/))) return +m[1] * 60 + +m[2];
+  if ((m = t.match(/^(\d+)\s*h(?:\s*(\d{1,2})\s*m?)?$/))) return +m[1] * 60 + (m[2] ? +m[2] : 0);
+  if ((m = t.match(/^(\d+)\s*m(?:in)?$/))) return +m[1];
+  return NaN;
+}
+
+/* Regla: la meta de la semana es metaDiaria × 7. Cada día con horas cargadas queda fijo; lo que falta
+   para la meta de la semana se reparte en partes iguales entre TODOS los días que todavía no
+   cargaste. Sin nada cargado, todos los días muestran la meta diaria. */
+function calcularEstudio(override) {
+  const sem = estSemanas[semanaKey] || {};
+  const dias = [];
+  const pend = [];
+  let hecho = 0;
+  for (let i = 0; i < 7; i++) {
+    const v = override && override.i === i ? override.min : sem["d" + i];   // override: valor que se está tipeando
+    const cargado = Number.isInteger(v) && v >= 0 && v <= 1440;
+    if (cargado) hecho += v;
+    dias.push({ i, cargado, min: cargado ? v : null });
+    if (!cargado) pend.push(i);
+  }
+  const total = metaMin * 7;
+  const falta = Math.max(0, total - hecho);
+  const objetivoPend = pend.length ? Math.ceil(falta / pend.length) : 0;
+  return { dias, hecho, total, falta, pend, objetivoPend };
+}
+
+function reiniciarEstudio() {
+  const wk = semanaKey;
+  const previo = { ...(estSemanas[wk] || {}) };
+  const ids = Object.keys(previo);
+  if (!ids.length) { mostrarToast("No hay nada para reiniciar"); return; }
+  const cambios = {};
+  ids.forEach((id) => (cambios[id] = null));
+  escribirEst(wk, cambios);
+  mostrarToast("Estudio de la semana reiniciado", () => escribirEst(wk, previo));
+}
+
 /* ---------- Render ---------- */
 function render() {
+  $("#tabEstudio").setAttribute("aria-selected", String(vista === "estudio"));
+  $("#tabGym").setAttribute("aria-selected", String(vista === "gym"));
+  $("#bloqueEstudio").hidden = vista !== "estudio";
+  $("#bloqueGym").hidden = vista !== "gym";
+  document.documentElement.classList.toggle("v-estudio", vista === "estudio");
+  if (vista === "estudio") renderEstudio(); else renderGym();
+}
+
+let estClave = "";
+function construirEstDias() {
+  const fechas = fechasSemana(semanaKey);
+  const hoyIdx = new Date().getDay();
+  $("#estDias").innerHTML = DIAS.map((d, i) => `<div class="est-fila${i === hoyIdx ? " hoy" : ""}" data-i="${i}">
+      <div class="dia-cab"><div class="dia-nombre">${d.abr}</div><div class="dia-fecha">${i === hoyIdx ? "Hoy" : `${fechas[i].getDate()} ${MESES[fechas[i].getMonth()]}`}</div></div>
+      <label class="est-campo"><input class="est-input" data-i="${i}" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Horas estudiadas el ${d.nombre.toLowerCase()}"><span class="est-h">h</span></label>
+      <span class="est-estado"></span></div>`).join("");
+  estClave = semanaKey + "|" + hoyIdx;
+}
+
+function renderEstudio() { pintarEstudio(); }
+
+// Actualiza todo "en el lugar" para no cortar lo que estás escribiendo. override = lo que estás tipeando ahora.
+function pintarEstudio(override) {
+  const activo = document.activeElement;
+  const enFoco = !!(activo && activo.classList && activo.classList.contains("est-input"));
+  if (!$("#matLista").children.length) construirMaterias();
+  const clave = semanaKey + "|" + new Date().getDay();
+  if (!enFoco && (clave !== estClave || !$("#estDias").children.length)) construirEstDias();
+
+  const c = calcularEstudio(override);
+  const fechas = fechasSemana(semanaKey);
+  $("#estRango").textContent = textoRango(fechas);
+  $("#estHechas").textContent = fmt(c.hecho);
+  $("#estTotal").textContent = "/ " + fmt(c.total);
+  const pct = c.total ? Math.min(100, (c.hecho / c.total) * 100) : 0;
+  $("#estBarra").style.width = pct + "%";
+  $("#estBarraWrap").setAttribute("aria-valuenow", String(Math.round(pct)));
+
+  let resumen, cumplida = false;
+  if (c.falta === 0) {
+    resumen = "<b>Meta semanal cumplida.</b> Lo que sigue es de regalo.";
+    cumplida = true;
+  } else if (c.pend.length) {
+    const n = c.pend.length;
+    resumen = `Faltan <b>${fmt(c.falta)}</b> · te toca <b>${fmt(c.objetivoPend)}</b> por día (${n} ${n === 1 ? "día" : "días"})`;
+  } else {
+    resumen = `La semana cerró: faltaron <b>${fmt(c.falta)}</b>`;
+  }
+  const cumplidos = c.dias.filter((d) => d.cargado && d.min >= metaMin).length;
+  resumen += `<span class="est-sub">${cumplidos} de 7 días en la meta</span>`;
+  $("#estResumen").innerHTML = resumen;
+  $("#estResumen").classList.toggle("ok", cumplida);
+  $("#btnMeta").textContent = `Meta diaria: ${fmt(metaMin)} · cambiar`;
+
+  $("#estDias").querySelectorAll(".est-fila").forEach((fila) => {
+    const d = c.dias[Number(fila.dataset.i)];
+    const input = fila.querySelector(".est-input");
+    const campo = fila.querySelector(".est-campo");
+    const estado = fila.querySelector(".est-estado");
+    if (input !== activo) input.value = d.cargado ? fmtInput(d.min) : "";
+    let ph = "—", cls = "", txt = "";
+    if (d.cargado) {
+      const diff = d.min - metaMin;
+      cls = diff >= 0 ? "ok" : "falto";
+      txt = diff === 0 ? "en la meta" : (diff > 0 ? "+" : "−") + fmt(Math.abs(diff));
+    } else {
+      ph = c.falta === 0 ? "0" : fmtInput(c.objetivoPend);
+      txt = c.falta === 0 ? "libre" : "te toca";
+    }
+    input.placeholder = ph;
+    campo.className = "est-campo" + (cls ? " " + cls : "") + (campo.classList.contains("error") ? " error" : "");
+    estado.className = "est-estado" + (cls ? " " + cls : "");
+    estado.textContent = txt;
+  });
+  pintarMaterias(c, override);
+}
+
+/* ---------- Horas por materia (se guardan junto a los días, como m_<id> en la misma semana) ---------- */
+function minMateria(id) {
+  const v = (estSemanas[semanaKey] || {})["m_" + id];
+  return Number.isInteger(v) && v >= 0 && v <= 10080 ? v : null;
+}
+function construirMaterias() {
+  $("#matLista").innerHTML = MATERIAS.map((m) => `<div class="mat-fila" style="--rgb:${m.rgb}">
+      <span class="mat-nombre"><i class="mat-punto"></i>${esc(m.nombre)}</span>
+      <label class="est-campo"><input class="est-input mat-input" data-m="${m.id}" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0" aria-label="Horas de ${esc(m.nombre)} esta semana"><span class="est-h">h</span></label>
+    </div>`).join("");
+  $("#matBarra").innerHTML = MATERIAS.map((m) => `<i data-m="${m.id}" style="--rgb:${m.rgb};width:0"></i>`).join("");
+}
+function pintarMaterias(c, override) {
+  const activo = document.activeElement;
+  const vals = {};
+  let suma = 0;
+  MATERIAS.forEach((m) => {
+    let v = override && override.m === m.id ? override.min : minMateria(m.id);
+    v = Number.isInteger(v) ? v : null;
+    vals[m.id] = v;
+    suma += v || 0;
+  });
+  const base = Math.max(c.hecho, suma, 1);
+  MATERIAS.forEach((m) => {
+    const input = $(`#matLista .mat-input[data-m="${m.id}"]`);
+    if (input && input !== activo) input.value = vals[m.id] !== null ? fmtInput(vals[m.id]) : "";
+    const seg = $(`#matBarra i[data-m="${m.id}"]`);
+    if (seg) seg.style.width = ((vals[m.id] || 0) / base) * 100 + "%";
+  });
+  const r = $("#matResumen");
+  r.textContent = `${fmt(suma)} de ${fmt(c.hecho)}`;
+  r.classList.toggle("alerta", suma > c.hecho);
+  r.title = suma > c.hecho ? "Asignaste más horas a las materias que las cargadas por día" : "Horas asignadas a materias, sobre las estudiadas por día";
+}
+function confirmarMateria(t) {
+  const id = t.dataset.m, k = "m_" + id;
+  const min = parsearHoras(t.value);
+  const previo = (estSemanas[semanaKey] || {})[k];
+  if (Number.isNaN(min) || (min !== null && min > 10080)) {
+    mostrarToast("No entendí ese número. Probá con 2,5 · 2:30 · 1h30");
+    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    pintarEstudio();
+    return;
+  }
+  if (min === null) { if (previo !== undefined) escribirEst(semanaKey, { [k]: null }); else pintarEstudio(); return; }
+  if (min === previo) { pintarEstudio(); return; }
+  escribirEst(semanaKey, { [k]: min });
+}
+
+function confirmarHoras(t) {
+  const i = Number(t.dataset.i), k = "d" + i;
+  const campo = t.closest(".est-campo");
+  const min = parsearHoras(t.value);
+  const previo = (estSemanas[semanaKey] || {})[k];
+  if (Number.isNaN(min) || (min !== null && min > 1440)) {
+    campo.classList.remove("error");
+    mostrarToast("No entendí ese número. Probá con 2,5 · 2:30 · 1h30");
+    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    pintarEstudio();
+    return;
+  }
+  campo.classList.remove("error");
+  if (min === null) {                                       // casillero vacío = sacar ese día
+    if (previo !== undefined) escribirEst(semanaKey, { [k]: null }); else pintarEstudio();
+    return;
+  }
+  if (min === previo) { pintarEstudio(); return; }
+  escribirEst(semanaKey, { [k]: min });
+}
+
+function renderGym() {
   const a = asignadoActual();
   const fechas = fechasSemana(semanaKey);
   const hoyIdx = new Date().getDay();
 
-  // Rango
-  const f0 = fechas[0], f6 = fechas[6];
-  $("#rango").textContent = f0.getMonth() === f6.getMonth()
-    ? `${f0.getDate()} – ${f6.getDate()} ${MESES[f6.getMonth()]}`
-    : `${f0.getDate()} ${MESES[f0.getMonth()]} – ${f6.getDate()} ${MESES[f6.getMonth()]}`;
+  $("#rango").textContent = textoRango(fechas);
 
   // Contador y barra segmentada (cada sesión hecha enciende un segmento con su color)
   const hechas = SESIONES.filter((s) => a[s.id] !== undefined);
@@ -803,14 +1209,11 @@ function render() {
 }
 
 /* ---------- Fechas importantes ---------- */
-const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
 function objetivoFecha(txt) {
   if (!txt) return null;
   const d = new Date(txt.length === 10 ? txt + "T00:00:00" : txt);
   return isNaN(d) ? null : d;
 }
-
 function renderFechas() {
   const ahora = new Date();
   const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
@@ -830,9 +1233,9 @@ function renderFechas() {
         const m = Math.floor((diff % 3600000) / 60000);
         num = String(d);
         resto = `${d === 1 ? "día" : "días"} · ${String(h).padStart(2, "0")} h ${String(m).padStart(2, "0")} m`;
-        clase = "";
+        clase = d <= 3 ? " urg3" : d <= 7 ? " urg7" : "";      // se acerca: naranja a 7 días, rojo a 3
       } else if (objDia === hoy0) {
-        num = "Hoy"; resto = "¡es el día!"; clase = "";
+        num = "Hoy"; resto = "¡es el día!"; clase = " urg3";
       } else {
         resto = "Ya pasó";
       }
@@ -840,27 +1243,6 @@ function renderFechas() {
     return `<div class="cuenta${clase}" style="--rgb:${f.rgb}"><div class="cuenta-num">${num}</div><div class="cuenta-info"><span class="cuenta-nombre">${esc(f.nombre)}</span><span class="cuenta-resto">${resto}</span></div></div>`;
   }).join("");
 }
-
-/* ---------- Notitas ---------- */
-function construirNotas() {
-  $("#notasLista").innerHTML = IDS_NOTAS.map((id, i) =>
-    `<div class="nota" style="--rgb:${COLORES_NOTAS[i]}"><textarea data-nota="${id}" rows="3" maxlength="600" placeholder="Nota…" aria-label="Nota ${i + 1}"></textarea></div>`
-  ).join("");
-  pintarNotas();
-}
-function pintarNotas() {
-  document.querySelectorAll("#notasLista textarea").forEach((t) => {
-    if (document.activeElement === t) return;           // no pisar lo que estás escribiendo
-    const v = notas[t.dataset.nota] || "";
-    if (t.value !== v) t.value = v;
-  });
-}
-function enviarNota(id) {
-  pendientesNotas.delete(id);
-  if (!db || !codigo) return;
-  setDoc(doc(db, COLECCION, codigo), { notas: { [id]: notas[id] || "" } }, { merge: true }).catch(falloSync);
-}
-function enviarNotasPendientes() { [...pendientesNotas].forEach((id) => { clearTimeout(timersNotas[id]); enviarNota(id); }); }
 
 /* ---------- Editor de fechas importantes ---------- */
 let borrador = [];
@@ -884,16 +1266,6 @@ function abrirEditorFechas() {
   $("#sheetFechas").classList.add("abierto");
 }
 function cerrarEditorFechas() { $("#sheetFechas").classList.remove("abierto"); }
-function falloFechas(err) {
-  console.error(err);
-  const c = err && err.code ? String(err.code).replace("firestore/", "") : "desconocido";
-  avisoFechasTexto = c === "permission-denied"
-    ? "Las fechas quedaron guardadas en este dispositivo, pero Firebase no deja sincronizarlas: en las reglas de Firestore hay que permitir también el campo fechas."
-    : `Las fechas quedaron guardadas en este dispositivo, pero no se pudieron sincronizar (${c}).`;
-  const a = $("#avisoError");
-  a.textContent = avisoFechasTexto;
-  a.hidden = false;
-}
 function guardarFechas() {
   const lista = sanearFechas(leerFilasFechas()) || [];
   lista.sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999"));
@@ -902,13 +1274,34 @@ function guardarFechas() {
   renderFechas();
   cerrarEditorFechas();
   mostrarToast("Fechas guardadas");
-  if (!db || !codigo) return;
-  setDoc(doc(db, COLECCION, codigo), { fechas: lista }, { merge: true })
-    .then(() => { if (avisoFechasTexto) { avisoFechasTexto = ""; $("#avisoError").hidden = estadoActual !== "error"; } })
+  if (!db) return;
+  setDoc(doc(db, COLECCION, DOC_GYM), { fechas: lista }, { merge: true })
+    .then(() => { avisos.fechas = ""; pintarAviso(); })
     .catch(falloFechas);
 }
 
-/* ---------- Hoja de selección ---------- */
+/* ---------- Notitas ---------- */
+function construirNotas() {
+  $("#notasLista").innerHTML = IDS_NOTAS.map((id, i) =>
+    `<div class="nota" style="--rgb:${COLORES_NOTAS[i]}"><textarea data-nota="${id}" rows="3" maxlength="600" placeholder="Nota…" aria-label="Nota ${i + 1}"></textarea></div>`
+  ).join("");
+  pintarNotas();
+}
+function pintarNotas() {
+  document.querySelectorAll("#notasLista textarea").forEach((t) => {
+    if (document.activeElement === t) return;           // no pisar lo que estás escribiendo
+    const v = notas[t.dataset.nota] || "";
+    if (t.value !== v) t.value = v;
+  });
+}
+function enviarNota(id) {
+  pendientesNotas.delete(id);
+  if (!db) return;
+  setDoc(doc(db, COLECCION, DOC_GYM), { notas: { [id]: notas[id] || "" } }, { merge: true }).catch(falloSync);
+}
+function enviarNotasPendientes() { [...pendientesNotas].forEach((id) => { clearTimeout(timersNotas[id]); enviarNota(id); }); }
+
+/* ---------- Hoja de selección (gimnasio) ---------- */
 function abrirSheetDia(sid) {
   const s = sesionPorId(sid);
   const fechas = fechasSemana(semanaKey);
@@ -925,7 +1318,6 @@ function abrirSheetDia(sid) {
   ).join("");
   abrirSheet();
 }
-
 function abrirSheetSesion(dia) {
   const a = asignadoActual();
   const faltan = SESIONES.filter((s) => a[s.id] === undefined);
@@ -938,13 +1330,26 @@ function abrirSheetSesion(dia) {
   ).join("");
   abrirSheet();
 }
-
 function abrirSheet() {
   $("#sheet").classList.add("abierto");
   const primero = $("#sheetOpciones button:not([disabled])");
   if (primero) primero.focus({ preventScroll: true });
 }
 function cerrarSheet() { $("#sheet").classList.remove("abierto"); ctxSheet = null; }
+
+/* ---------- Hoja para cargar horas / cambiar meta (estudio) ---------- */
+const PRESETS_MIN = [60, 90, 120, 150, 180, 240];
+function abrirHoras() {
+  ctxHoras = { tipo: "meta" };
+  $("#tituloHoras").textContent = "Meta diaria de estudio";
+  $("#ayudaHoras").textContent = "La meta de la semana es esto por 7. Escribilo como 2,5 · 2:30 · 1h30.";
+  $("#inputHoras").value = fmtInput(metaMin);
+  $("#presetsHoras").innerHTML = PRESETS_MIN.map((m) => `<button type="button" class="preset" data-min="${m}">${fmt(m)}</button>`).join("");
+  $("#errorHoras").textContent = "";
+  $("#sheetHoras").classList.add("abierto");
+  setTimeout(() => { const i = $("#inputHoras"); i.focus({ preventScroll: true }); i.select(); }, 50);
+}
+function cerrarHoras() { $("#sheetHoras").classList.remove("abierto"); ctxHoras = null; }
 
 /* ---------- Aviso con deshacer ---------- */
 let toastTimer = null, toastUndo = null;
@@ -958,25 +1363,22 @@ function mostrarToast(texto, undo) {
 }
 function ocultarToast() { $("#toast").classList.remove("visible"); toastUndo = null; }
 
-/* ---------- Pantallas ---------- */
-function mostrarPantallaCodigo(permitirCancelar) {
-  $("#vistaApp").hidden = true;
-  $("#lateralIzq").hidden = true;
-  $("#lateralDer").hidden = true;
-  $("#vistaCodigo").hidden = false;
-  $("#cancelarCodigo").hidden = !permitirCancelar;
-  $("#errorCodigo").textContent = "";
-  $("#inputCodigo").value = permitirCancelar && codigo ? codigo : "";
-  setTimeout(() => $("#inputCodigo").focus({ preventScroll: true }), 50);
-}
+/* ---------- Pantalla ---------- */
 function mostrarApp() {
-  $("#vistaCodigo").hidden = true;
   $("#vistaApp").hidden = false;
   $("#lateralIzq").hidden = false;
   $("#lateralDer").hidden = false;
   render();
   renderFechas();
   construirNotas();
+}
+function cambiarVista(v) {
+  if (v === vista || !["estudio", "gym"].includes(v)) return;
+  vista = v;
+  ls.set(LS_VISTA, v);
+  desarmarReset();
+  render();
+  if (!vistaURL) guardarAjustesEst({ vista: v });     // se sincroniza: el fondo de la compu cambia solo
 }
 
 /* ---------- Eventos ---------- */
@@ -991,9 +1393,79 @@ document.addEventListener("click", (e) => {
   else if (accion === "chip") quitar(sid);
   else if (accion === "elegir-dia" && ctxSheet) { const s = ctxSheet.sid; cerrarSheet(); asignar(s, dia); }
   else if (accion === "elegir-sesion" && ctxSheet) { const d = ctxSheet.dia; cerrarSheet(); asignar(sid, d); }
+  else if (accion === "vista") cambiarVista(el.dataset.vista);
 });
 
 $("#sheetCancelar").addEventListener("click", cerrarSheet);
+
+// Horas de estudio
+$("#btnMeta").addEventListener("click", abrirHoras);
+$("#matLista").addEventListener("input", (e) => {
+  const t = e.target.closest(".mat-input");
+  if (!t) return;
+  const min = parsearHoras(t.value);
+  const malo = Number.isNaN(min) || (min !== null && min > 10080);
+  t.closest(".est-campo").classList.toggle("error", malo);
+  pintarEstudio({ m: t.dataset.m, min: malo ? null : min });
+});
+$("#matLista").addEventListener("change", (e) => { const t = e.target.closest(".mat-input"); if (t) confirmarMateria(t); });
+$("#matLista").addEventListener("keydown", (e) => {
+  const t = e.target.closest(".mat-input");
+  if (!t) return;
+  if (e.key === "Enter") { e.preventDefault(); t.blur(); }
+  else if (e.key === "Escape") {
+    const previo = (estSemanas[semanaKey] || {})["m_" + t.dataset.m];
+    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    t.closest(".est-campo").classList.remove("error");
+    t.blur();
+    pintarEstudio();
+  }
+});
+$("#estDias").addEventListener("input", (e) => {
+  const t = e.target.closest(".est-input");
+  if (!t) return;
+  const min = parsearHoras(t.value);
+  const malo = Number.isNaN(min) || (min !== null && min > 1440);
+  t.closest(".est-campo").classList.toggle("error", malo);
+  pintarEstudio({ i: Number(t.dataset.i), min: malo ? null : min });   // vista previa en vivo
+});
+$("#estDias").addEventListener("change", (e) => { const t = e.target.closest(".est-input"); if (t) confirmarHoras(t); });
+$("#estDias").addEventListener("keydown", (e) => {
+  const t = e.target.closest(".est-input");
+  if (!t) return;
+  if (e.key === "Enter") { e.preventDefault(); t.blur(); }
+  else if (e.key === "Escape") {
+    const previo = (estSemanas[semanaKey] || {})["d" + t.dataset.i];
+    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    t.closest(".est-campo").classList.remove("error");
+    t.blur();
+    pintarEstudio();
+  }
+});
+$("#cancelarHoras").addEventListener("click", cerrarHoras);
+$("#sheetHoras").addEventListener("click", (e) => { if (e.target === $("#sheetHoras")) cerrarHoras(); });
+$("#presetsHoras").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-min]");
+  if (!b) return;
+  $("#inputHoras").value = fmtInput(Number(b.dataset.min));
+  $("#errorHoras").textContent = "";
+  $("#inputHoras").focus({ preventScroll: true });
+});
+$("#formHoras").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const min = parsearHoras($("#inputHoras").value);
+  if (min === null || Number.isNaN(min) || !metaValida(min)) {
+    $("#errorHoras").textContent = "Escribilo así: 2,5 · 2:30 · 1h30 (entre 15 minutos y 24 h).";
+    return;
+  }
+  metaMin = min;
+  cerrarHoras();
+  render();
+  guardarAjustesEst({ meta: String(min) });
+  mostrarToast(`Meta diaria: ${fmt(min)}`);
+});
+
+// Editor de fechas
 $("#btnFechas").addEventListener("click", abrirEditorFechas);
 $("#cancelarFechas").addEventListener("click", cerrarEditorFechas);
 $("#guardarFechas").addEventListener("click", guardarFechas);
@@ -1012,8 +1484,11 @@ $("#listaEditorFechas").addEventListener("click", (e) => {
   borrador.splice(Number(b.dataset.i), 1);
   pintarEditorFechas();
 });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarEditorFechas(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrarSheet(); });
+
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  cerrarSheet(); cerrarHoras(); cerrarEditorFechas();
+});
 
 $("#toastDeshacer").addEventListener("click", () => {
   const fn = toastUndo;
@@ -1021,7 +1496,7 @@ $("#toastDeshacer").addEventListener("click", () => {
   if (fn) fn();
 });
 
-// Reiniciar: confirmación en dos toques
+// Reiniciar: confirmación en dos toques (reinicia la vista que estás mirando)
 let resetArmado = false, resetTimer = null;
 function desarmarReset() {
   resetArmado = false;
@@ -1038,34 +1513,8 @@ $("#btnReset").addEventListener("click", () => {
     resetTimer = setTimeout(desarmarReset, 3500);
   } else {
     desarmarReset();
-    reiniciar();
+    if (vista === "estudio") reiniciarEstudio(); else reiniciar();
   }
-});
-
-$("#btnCambiarCodigo").addEventListener("click", () => mostrarPantallaCodigo(true));
-// Copia el link del modo fondo con el código incluido: pegalo en Lively y nunca más lo pide
-$("#btnLively").addEventListener("click", async () => {
-  if (!codigo) return;
-  const url = `${location.origin}${location.pathname}?modo=fondo&codigo=${encodeURIComponent(codigo)}`;
-  try {
-    await navigator.clipboard.writeText(url);
-    mostrarToast("Link copiado. Pegalo en Lively como dirección del fondo.");
-  } catch {
-    const aviso = $("#avisoError");
-    aviso.textContent = "Copiá este link y pegalo en Lively: " + url;
-    aviso.hidden = false;
-  }
-});
-$("#cancelarCodigo").addEventListener("click", mostrarApp);
-$("#formCodigo").addEventListener("submit", (e) => {
-  e.preventDefault();
-  const r = normalizarCodigo($("#inputCodigo").value);
-  if (!r.ok) { $("#errorCodigo").textContent = r.error; return; }
-  codigo = r.valor;
-  ls.set(LS_CODIGO, codigo);
-  cargarCache();
-  mostrarApp();
-  suscribir();
 });
 
 // Notitas: guardan solas al escribir y al salir del cuadro
@@ -1087,8 +1536,8 @@ $("#notasLista").addEventListener("focusout", (e) => {
 });
 
 // Conexión
-window.addEventListener("offline", () => { if (db && codigo) setEstado("offline"); });
-window.addEventListener("online", () => { if (db && codigo && estadoActual === "offline") setEstado("conectando"); });
+window.addEventListener("offline", () => { if (db) setEstado("offline"); });
+window.addEventListener("online", () => { if (db && estadoActual === "offline") setEstado("conectando"); });
 
 // Cambio de día / semana (importante para el fondo, que queda abierto días)
 function revisarFecha() {
@@ -1098,10 +1547,10 @@ function revisarFecha() {
     const cambioSemana = k !== semanaKey;
     semanaKey = k;
     hoyStr = h;
-    if (cambioSemana) limpiarSemanasViejas();          // domingo: arranca de cero y se borra la semana anterior
-    if (!$("#vistaApp").hidden) render();
+    if (cambioSemana) { limpiarSemanasViejas(); limpiarEstViejas(); }   // domingo: arranca de cero
+    render();
   }
-  if (!$("#lateralIzq").hidden) renderFechas();     // actualiza los contadores
+  renderFechas();                                    // actualiza los contadores
 }
 setInterval(revisarFecha, 30000);
 document.addEventListener("visibilitychange", () => {
@@ -1110,26 +1559,22 @@ document.addEventListener("visibilitychange", () => {
 
 /* ---------- Inicio ---------- */
 (function iniciar() {
-  // Atajo: ?codigo=mi-codigo-largo guarda el código (útil en Lively, que tiene su propio almacenamiento)
-  const deURL = params.get("codigo");
-  let urlOk = { ok: false };
-  if (deURL) {
-    urlOk = normalizarCodigo(deURL);
-    if (urlOk.ok) ls.set(LS_CODIGO, urlOk.valor);
+  cargarCache();
+  // Una sola vez por dispositivo: los exámenes nuevos reemplazan la lista vieja (local y la del servidor)
+  if (!ls.get(LS_MIGRA)) {
+    listaFechas = FECHAS_BASE.map((f) => ({ ...f }));
+    guardarCacheFechas();
+    ls.set(LS_MIGRA, "1");
+    migrandoFechas = true;
   }
-  const fijo = CODIGO_FIJO ? normalizarCodigo(CODIGO_FIJO) : { ok: false };
-  if (fijo.ok) { $("#btnCambiarCodigo").hidden = true; $("#btnLively").hidden = true; }      // con código fijo no hay nada que cambiar
-  const guardado = ls.get(LS_CODIGO);
-  // Prioridad: código fijo > código de la URL (no depende del almacenamiento) > código guardado
-  const r = fijo.ok ? fijo : (urlOk.ok ? urlOk : (guardado ? normalizarCodigo(guardado) : { ok: false }));
-  if (r.ok) {
-    codigo = r.valor;
-    cargarCache();
-    mostrarApp();
-    suscribir();
-  } else {
-    setEstado("local");
-    mostrarPantallaCodigo(false);
+  mostrarApp();
+  suscribirGym();
+  suscribirEst();
+  if (migrandoFechas) {
+    if (!db) migrandoFechas = false;
+    else setDoc(doc(db, COLECCION, DOC_GYM), { fechas: listaFechas }, { merge: true })
+      .catch(falloFechas)
+      .finally(() => { migrandoFechas = false; });
   }
 })();
 </script>
