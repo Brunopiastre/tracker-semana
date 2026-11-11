@@ -593,7 +593,6 @@ const LS_NOTAS = "tracker_notas_";
 const LS_FECHAS = "tracker_fechas_";
 const LS_EST = "tracker_estudio_";
 const LS_VISTA = "tracker_vista";
-const LS_MIGRA = "tracker_fechas_v2";   // marca: ya se cargaron los exámenes nuevos en este dispositivo
 
 const META_DEFECTO = 150;               // 2 h 30 m por día
 
@@ -632,7 +631,8 @@ const FECHAS_BASE = [
   { nombre: "Final de Física",          fecha: "2026-12-16", rgb: "240 113 107" },
   { nombre: "Viaje",                    fecha: "2026-12-17", rgb: "79 209 165" }
 ];
-let listaFechas = FECHAS_BASE.map((f) => ({ ...f }));
+let listaFechas = [];                    // la lista real viene del servidor (o de la copia local)
+let fechasSinDatos = true;               // true = todavía no sabemos cuál es tu lista; no mostrar ni pisar nada
 const COLORES_FECHAS = ["92 200 242", "245 168 90", "169 139 245", "79 209 165", "240 113 107", "245 208 120", "79 140 245", "240 150 170"];
 const MAX_FECHAS = 8;
 
@@ -697,7 +697,6 @@ let metaMin = META_DEFECTO;             // meta diaria de estudio, en minutos
 let semanaKey = claveSemana(new Date());
 let hoyStr = new Date().toDateString();
 let desuscribirGym = null, desuscribirEst = null;
-let migrandoFechas = false;             // mientras se suben las fechas nuevas, no pisarlas con las viejas del servidor
 let ctxSheet = null;                    // { tipo: "dia", sid } | { tipo: "sesion", dia }
 let ctxHoras = null;                    // { tipo: "dia", i } | { tipo: "meta" }
 const pendientesNotas = new Set();
@@ -733,8 +732,8 @@ function cargarCache() {
   try { notas = JSON.parse(ls.get(LS_NOTAS + CODIGO) || "{}") || {}; } catch { notas = {}; }
   try {
     const f = sanearFechas(JSON.parse(ls.get(LS_FECHAS + CODIGO) || "null"));
-    listaFechas = f || FECHAS_BASE.map((x) => ({ ...x }));
-  } catch { listaFechas = FECHAS_BASE.map((x) => ({ ...x })); }
+    if (f) { listaFechas = f; fechasSinDatos = false; }
+  } catch {}
   try {
     const e = JSON.parse(ls.get(LS_EST + CODIGO) || "null") || {};
     estSemanas = e.semanas || {};
@@ -878,13 +877,15 @@ function suscribirGym() {
         if (IDS_NOTAS.some((id) => notas[id])) subir.notas = notas;
         setDoc(ref, subir, { merge: true }).catch(falloSync);
       }
+      sembrarFechas();
       setEstado("ok");
       return;
     }
     const datos = snap.data();
     semanas = datos.semanas || {};
     limpiarSemanasViejas();
-    if (Array.isArray(datos.fechas) && !migrandoFechas) { listaFechas = sanearFechas(datos.fechas) || listaFechas; guardarCacheFechas(); }
+    if (Array.isArray(datos.fechas)) { listaFechas = sanearFechas(datos.fechas) || listaFechas; fechasSinDatos = false; guardarCacheFechas(); }
+    else if (!snap.metadata.fromCache) sembrarFechas();       // el servidor nunca tuvo lista: sembrar la inicial una vez
     const remotas = datos.notas || {};
     IDS_NOTAS.forEach((id) => {
       if (!pendientesNotas.has(id)) notas[id] = typeof remotas[id] === "string" ? remotas[id] : "";
@@ -1214,10 +1215,19 @@ function objetivoFecha(txt) {
   const d = new Date(txt.length === 10 ? txt + "T00:00:00" : txt);
   return isNaN(d) ? null : d;
 }
+function sembrarFechas() {
+  if (!fechasSinDatos) return;                       // ya hay una lista tuya: no tocar
+  listaFechas = FECHAS_BASE.map((f) => ({ ...f }));
+  fechasSinDatos = false;
+  guardarCacheFechas();
+  renderFechas();
+  if (db) setDoc(doc(db, COLECCION, DOC_GYM), { fechas: listaFechas }, { merge: true }).catch(falloFechas);
+}
 function renderFechas() {
   const ahora = new Date();
   const hoy0 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).getTime();
   if (!listaFechas.length) {
+    if (fechasSinDatos) { $("#fechasLista").innerHTML = ""; return; }
     $("#fechasLista").innerHTML = '<div class="cuenta vacia"><div class="cuenta-num">—</div><div class="cuenta-info"><span class="cuenta-nombre">Sin fechas</span><span class="cuenta-resto">Tocá "Editar fechas"</span></div></div>';
     return;
   }
@@ -1270,6 +1280,7 @@ function guardarFechas() {
   const lista = sanearFechas(leerFilasFechas()) || [];
   lista.sort((a, b) => (a.fecha || "9999").localeCompare(b.fecha || "9999"));
   listaFechas = lista;
+  fechasSinDatos = false;
   guardarCacheFechas();
   renderFechas();
   cerrarEditorFechas();
@@ -1560,22 +1571,10 @@ document.addEventListener("visibilitychange", () => {
 /* ---------- Inicio ---------- */
 (function iniciar() {
   cargarCache();
-  // Una sola vez por dispositivo: los exámenes nuevos reemplazan la lista vieja (local y la del servidor)
-  if (!ls.get(LS_MIGRA)) {
-    listaFechas = FECHAS_BASE.map((f) => ({ ...f }));
-    guardarCacheFechas();
-    ls.set(LS_MIGRA, "1");
-    migrandoFechas = true;
-  }
+  if (!db) sembrarFechas();                      // sin Firebase: lista inicial solo en este dispositivo
   mostrarApp();
   suscribirGym();
   suscribirEst();
-  if (migrandoFechas) {
-    if (!db) migrandoFechas = false;
-    else setDoc(doc(db, COLECCION, DOC_GYM), { fechas: listaFechas }, { merge: true })
-      .catch(falloFechas)
-      .finally(() => { migrandoFechas = false; });
-  }
 })();
 </script>
 </body>
