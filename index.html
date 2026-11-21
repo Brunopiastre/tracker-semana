@@ -424,6 +424,35 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
 .mat-punto { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: rgb(var(--rgb)); flex: none; }
 .mat-fila .est-campo { padding: 0.25rem 0.6rem; }
 .mat-fila .est-input { font-size: 1rem; }
+
+/* ===== Horas + minutos, editores ===== */
+.est-campo { justify-content: flex-end; gap: 0.2rem; }
+.est-campo .est-in { flex: none; width: 2.3rem; padding: 0.1rem 0; text-align: right; }
+.est-campo .est-in[data-k="m"] { width: 2rem; text-align: right; margin-left: 0.25rem; }
+.est-campo .est-in::placeholder { opacity: 0.55; }
+.mat-fila .est-campo .est-in { font-size: 1rem; width: 2.1rem; }
+.mat-fila .est-campo .est-in[data-k="m"] { width: 1.7rem; }
+.mat-fila { grid-template-columns: 1fr auto; }
+.est-fila { grid-template-columns: 2.8rem auto 1fr; }
+.est-fila .est-estado { text-align: left; padding-left: 0.2rem; }
+.meta-campo { justify-content: center; padding: 0.55rem 0.8rem; }
+.meta-campo .est-in { font-size: 1.8rem; width: 3.4rem; text-align: center; }
+.meta-campo .est-in[data-k="m"] { width: 2.8rem; text-align: center; }
+.meta-campo .est-h { font-size: 1rem; }
+.mat-editar { margin-top: 0.5rem; }
+.fila-ed { display: grid; grid-template-columns: auto 1fr auto; gap: 0.4rem; margin-bottom: 0.55rem; align-items: center; }
+.fila-ed input.ed-nombre, .fila-ed input.ed-sub, input.ed-nombre {
+  width: 100%; min-width: 0; padding: 0.6rem 0.7rem; border-radius: 0.7rem;
+  background: var(--superficie); border: 1px solid var(--borde);
+  color: var(--texto); font: inherit; font-size: 0.95rem;
+}
+.fila-ed .ed-datos { display: grid; gap: 0.3rem; min-width: 0; }
+.fila-ed input.ed-sub { font-size: 0.8rem; padding: 0.45rem 0.7rem; color: var(--suave); }
+.ed-color { width: 1.7rem; height: 1.7rem; border-radius: 50%; border: 2px solid rgb(255 255 255 / 0.18); background: rgb(var(--rgb)); padding: 0; }
+.ed-ayuda { margin: 0 0 0.8rem; color: var(--suave); font-size: 0.82rem; line-height: 1.4; }
+.ed-lab { display: block; margin: 0 0 0.4rem; color: var(--suave); font-size: 0.85rem; }
+#errorEd { min-height: 1.1em; margin: 0.4rem 0 0.2rem; color: var(--peligro); font-size: 0.85rem; }
+.btn-gym-ed { margin-top: 0.9rem; }
 </style>
 </head>
 <body>
@@ -454,11 +483,12 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
         <button type="button" class="link est-meta" id="btnMeta"></button>
 
         <div class="est-lista" id="estDias"></div>
-        <p class="est-ayuda">Escribí las horas que estudiaste cada día (2,5 · 2:30 · 1h30). Lo gris es lo que te toca: se recalcula solo mientras tipeás.</p>
+        <p class="est-ayuda">Poné las horas y los minutos de cada día (ej. 4 y 30). Lo gris es lo que te toca: se recalcula solo mientras tipeás.</p>
 
         <div class="seccion-titulo mat-titulo">Por materia <span id="matResumen"></span></div>
         <div class="mat-barra" id="matBarra"></div>
         <div class="mat-lista" id="matLista"></div>
+        <button type="button" class="link est-meta mat-editar" id="btnMaterias">Editar materias</button>
       </div>
 
       <!-- ============ GIMNASIO ============ -->
@@ -469,7 +499,7 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
               <h1>Esta semana</h1>
               <p class="rango" id="rango"></p>
             </div>
-            <div class="contador" aria-live="polite"><span id="hechas">0</span><small>/7</small></div>
+            <div class="contador" aria-live="polite"><span id="hechas">0</span><small id="totalSes">/7</small></div>
           </div>
           <div class="segmentos" id="segmentos" role="progressbar" aria-label="Sesiones completadas" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0"></div>
         </header>
@@ -479,6 +509,7 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
 
         <div class="seccion-titulo">Te falta <span id="cuentaFaltan"></span></div>
         <div id="faltan"></div>
+        <button type="button" class="link est-meta btn-gym-ed" id="btnSesiones">Editar sesiones</button>
       </div>
 
       <div class="pie">
@@ -506,8 +537,7 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
       <h2 id="tituloHoras"></h2>
       <p class="ayuda-horas" id="ayudaHoras"></p>
       <form id="formHoras" novalidate>
-        <input id="inputHoras" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false"
-               placeholder="ej. 2,5  ·  2:30  ·  1h30" aria-label="Horas">
+        <div class="est-campo meta-campo" id="campoMeta"><input class="est-input est-in" data-k="h" maxlength="2" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="2" aria-label="Horas de la meta diaria"><span class="est-h">h</span><input class="est-input est-in" data-k="m" maxlength="2" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="30" aria-label="Minutos de la meta diaria"><span class="est-h">min</span></div>
         <div class="presets" id="presetsHoras"></div>
         <p class="error" id="errorHoras" role="alert"></p>
         <div class="acciones">
@@ -515,6 +545,21 @@ html.v-estudio .tabs { margin-bottom: 0.9rem; }
           <button type="button" class="btn-sec" id="cancelarHoras">Cancelar</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Editor de materias / sesiones -->
+  <div class="sheet" id="sheetEd" role="dialog" aria-modal="true" aria-labelledby="tituloEd">
+    <div class="sheet-card">
+      <h2 id="tituloEd"></h2>
+      <p class="ed-ayuda" id="ayudaEd"></p>
+      <div id="listaEd"></div>
+      <button type="button" class="btn-sec" id="agregarEd"></button>
+      <p id="errorEd" role="alert"></p>
+      <div class="acciones" style="margin-top:0.6rem">
+        <button type="button" class="btn-principal" id="guardarEd">Guardar</button>
+        <button type="button" class="btn-sec" id="cancelarEd">Cancelar</button>
+      </div>
     </div>
   </div>
 
@@ -593,11 +638,13 @@ const LS_NOTAS = "tracker_notas_";
 const LS_FECHAS = "tracker_fechas_";
 const LS_EST = "tracker_estudio_";
 const LS_VISTA = "tracker_vista";
+const LS_MAT = "tracker_materias_";
+const LS_SES = "tracker_sesiones_";
 
 const META_DEFECTO = 150;               // 2 h 30 m por día
 
 // Materias para repartir las horas de la semana (mismos colores que sus exámenes)
-const MATERIAS = [
+const MATERIAS_BASE = [
   { id: "fisica", nombre: "Física",           rgb: "245 168 90" },
   { id: "tele",   nombre: "Teleinformática",  rgb: "169 139 245" },
   { id: "infor",  nombre: "Ing. Informática", rgb: "240 150 170" },
@@ -605,15 +652,22 @@ const MATERIAS = [
   { id: "comp2",  nombre: "Computación 2",    rgb: "79 140 245" }
 ];
 
-const SESIONES = [
-  { id: "correr1",  nombre: "Correr 1", rgb: "92 200 242",  sub: "Continua ~5:00/km. Opcional: velocidad al final" },
+const SESIONES_BASE = [
+  { id: "correr1",  nombre: "Correr 1", rgb: "92 200 242",  sub: "Continua ~5:00/km + velocidad final" },
   { id: "pierna",   nombre: "Pierna",   rgb: "245 168 90",  sub: "Gimnasio, día de pierna" },
   { id: "empuje",   nombre: "Empuje",   rgb: "240 113 107", sub: "Pecho, hombro y tríceps" },
   { id: "tiron",    nombre: "Tirón",    rgb: "169 139 245", sub: "Espalda y bíceps" },
-  { id: "correr2",  nombre: "Correr 2", rgb: "92 200 242",  sub: "Continua ~5:00/km. Opcional: repechos" },
+  { id: "correr2",  nombre: "Correr 2", rgb: "92 200 242",  sub: "Continua ~5:00/km, con repechos" },
   { id: "fondo",    nombre: "Fondo",    rgb: "79 140 245",  sub: "Corrida larga" },
   { id: "descanso", nombre: "Descanso", rgb: "143 155 178", sub: "Día libre" }
 ];
+// Listas editables: lo que se ve ahora. Las reales vienen del servidor (o de la copia local); nunca se re-siembran las de fábrica.
+const COLORES_GYM = ["92 200 242", "245 168 90", "240 113 107", "169 139 245", "79 140 245", "79 209 165", "245 208 120", "143 155 178"];
+const MAX_MAT = 8, MAX_SES = 7;
+let MATERIAS = [], SESIONES = [];
+let materiasReales = [], sesionesReales = [];
+let materiasSinDatos = true, sesionesSinDatos = true;
+let baseVisible = false;                 // pasado un rato sin datos, se muestra la lista de fábrica (solo para mirar, no se guarda)
 const DIAS = [
   { abr: "Dom", nombre: "Domingo" }, { abr: "Lun", nombre: "Lunes" }, { abr: "Mar", nombre: "Martes" },
   { abr: "Mié", nombre: "Miércoles" }, { abr: "Jue", nombre: "Jueves" }, { abr: "Vie", nombre: "Viernes" },
@@ -644,6 +698,10 @@ const ICONO_MAS = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" st
 
 const $ = (s) => document.querySelector(s);
 const sesionPorId = (id) => SESIONES.find((s) => s.id === id);
+const pad2 = (n) => String(n).padStart(2, "0");
+const idNuevo = (p) => p + Math.random().toString(36).slice(2, 6);
+function nombreDe(x) { const o = ((semanas[semanaKey] || {})["n_" + x.id]); return typeof o === "string" && o.trim() ? o : x.nombre; }
+function renombrada(x) { return nombreDe(x) !== x.nombre; }
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 /* ---------- Almacenamiento local (con protección por si falla) ---------- */
@@ -727,6 +785,53 @@ function sanearFechas(arr) {
     rgb: COLORES_FECHAS.includes(f && f.rgb) ? f.rgb : COLORES_FECHAS[i % COLORES_FECHAS.length]
   })).filter((f) => f.nombre);
 }
+/* ---------- Materias y sesiones editables (se guardan como texto JSON en el documento de estudio) ---------- */
+function limpioId(v) { return String(v == null ? "" : v).replace(/[^a-zA-Z0-9]/g, "").slice(0, 12); }
+function parseLista(txt, max, esSes) {
+  let a; try { a = typeof txt === "string" ? JSON.parse(txt) : null; } catch { return null; }
+  if (!Array.isArray(a)) return null;
+  const vistos = new Set(), out = [];
+  for (const x of a.slice(0, max)) {
+    if (!Array.isArray(x)) continue;
+    const id = limpioId(x[0]); if (!id || vistos.has(id)) continue;
+    const nombre = String(x[1] == null ? "" : x[1]).trim().slice(0, esSes ? 18 : 20); if (!nombre) continue;
+    vistos.add(id);
+    const pal = esSes ? COLORES_GYM : COLORES_FECHAS;
+    const ci = Number.isInteger(x[esSes ? 3 : 2]) ? x[esSes ? 3 : 2] : 0;
+    const o = { id, nombre, rgb: pal[((ci % pal.length) + pal.length) % pal.length] };
+    if (esSes) o.sub = String(x[2] == null ? "" : x[2]).trim().slice(0, 36);
+    out.push(o);
+  }
+  return out;
+}
+const parseMat = (t) => parseLista(t, MAX_MAT, false);
+const parseSes = (t) => parseLista(t, MAX_SES, true);
+const serMat = (l) => JSON.stringify(l.map((m) => [m.id, m.nombre, Math.max(0, COLORES_FECHAS.indexOf(m.rgb))]));
+const serSes = (l) => JSON.stringify(l.map((m) => [m.id, m.nombre, m.sub || "", Math.max(0, COLORES_GYM.indexOf(m.rgb))]));
+function refrescarMaterias() {
+  const nueva = materiasSinDatos ? (baseVisible ? MATERIAS_BASE : []) : materiasReales;
+  if (JSON.stringify(nueva) !== JSON.stringify(MATERIAS)) { MATERIAS = nueva; const l = document.getElementById("matLista"); if (l) l.innerHTML = ""; }
+}
+function refrescarSesiones() {
+  SESIONES = sesionesSinDatos ? (baseVisible ? SESIONES_BASE : []) : sesionesReales;
+}
+function sembrarMaterias() {
+  if (!materiasSinDatos) return;
+  materiasReales = MATERIAS_BASE.map((m) => ({ ...m }));
+  materiasSinDatos = false;
+  ls.set(LS_MAT + CODIGO, serMat(materiasReales));
+  refrescarMaterias();
+  if (db) guardarAjustesEst({ materias: serMat(materiasReales) });
+}
+function sembrarSesiones() {
+  if (!sesionesSinDatos) return;
+  sesionesReales = SESIONES_BASE.map((m) => ({ ...m }));
+  sesionesSinDatos = false;
+  ls.set(LS_SES + CODIGO, serSes(sesionesReales));
+  refrescarSesiones();
+  if (db) guardarAjustesEst({ sesiones: serSes(sesionesReales) });
+}
+
 function cargarCache() {
   try { semanas = JSON.parse(ls.get(LS_CACHE + CODIGO) || "{}") || {}; } catch { semanas = {}; }
   try { notas = JSON.parse(ls.get(LS_NOTAS + CODIGO) || "{}") || {}; } catch { notas = {}; }
@@ -739,6 +844,9 @@ function cargarCache() {
     estSemanas = e.semanas || {};
     metaMin = metaValida(e.meta) ? e.meta : META_DEFECTO;
   } catch { estSemanas = {}; metaMin = META_DEFECTO; }
+  try { const m = parseMat(ls.get(LS_MAT + CODIGO)); if (m) { materiasReales = m; materiasSinDatos = false; } } catch {}
+  try { const m = parseSes(ls.get(LS_SES + CODIGO)); if (m) { sesionesReales = m; sesionesSinDatos = false; } } catch {}
+  refrescarMaterias(); refrescarSesiones();
   // Solo se conserva la semana en curso: lo de semanas anteriores se descarta
   for (const k of Object.keys(semanas)) if (k !== semanaKey) delete semanas[k];
   for (const k of Object.keys(estSemanas)) if (k !== semanaKey) delete estSemanas[k];
@@ -916,6 +1024,8 @@ function suscribirEst() {
       if (Object.keys(estSemanas).length) {               // el servidor no tiene nada: subir lo local
         setDoc(ref, { semanas: estSemanas, notas: { meta: String(metaMin) } }, { merge: true }).catch(falloEst);
       }
+      sembrarMaterias(); sembrarSesiones();               // el servidor nunca tuvo tus listas: sembrar las de fábrica una sola vez
+      render();
       return;
     }
     const datos = snap.data();
@@ -925,6 +1035,13 @@ function suscribirEst() {
     const mm = parseInt(n.meta, 10);
     if (metaValida(mm)) metaMin = mm;
     if (!vistaURL && (n.vista === "estudio" || n.vista === "gym")) { vista = n.vista; ls.set(LS_VISTA, vista); }
+    const lm = parseMat(n.materias);
+    if (lm) { materiasReales = lm; materiasSinDatos = false; ls.set(LS_MAT + CODIGO, serMat(lm)); }
+    else if (!snap.metadata.fromCache) sembrarMaterias();
+    const ls2 = parseSes(n.sesiones);
+    if (ls2) { sesionesReales = ls2; sesionesSinDatos = false; ls.set(LS_SES + CODIGO, serSes(ls2)); }
+    else if (!snap.metadata.fromCache) sembrarSesiones();
+    refrescarMaterias(); refrescarSesiones();
     guardarCacheEst();
     render();
   }, (err) => {
@@ -938,21 +1055,31 @@ function suscribirEst() {
 function asignar(sid, dia) {
   const a = asignadoActual();
   const cambios = { [sid]: dia };
-  for (const s of SESIONES) if (s.id !== sid && a[s.id] === dia) cambios[s.id] = null; // por si otro dispositivo ya la ocupó
+  for (const s of SESIONES) if (s.id !== sid && a[s.id] === dia) { cambios[s.id] = null; cambios["n_" + s.id] = null; } // por si otro dispositivo ya la ocupó
   escribir(semanaKey, cambios);
 }
 function quitar(sid) {
   const wk = semanaKey;
   const dia = asignadoActual()[sid];
   if (dia === undefined) return;
-  escribir(wk, { [sid]: null });
-  mostrarToast(`${sesionPorId(sid).nombre} quitada del ${DIAS[dia].nombre.toLowerCase()}`, () => escribir(wk, { [sid]: dia }));
+  const nom = (semanas[wk] || {})["n_" + sid];
+  const x = sesionPorId(sid);
+  const cuando = DIAS[dia].nombre.toLowerCase();
+  const nombre = x ? nombreDe(x) : "Sesión";
+  escribir(wk, { [sid]: null, ["n_" + sid]: null });
+  mostrarToast(`${nombre} quitada del ${cuando}`, () => escribir(wk, typeof nom === "string" ? { [sid]: dia, ["n_" + sid]: nom } : { [sid]: dia }));
 }
 function reiniciar() {
   const wk = semanaKey;
-  const previo = { ...asignadoActual() };
+  const a = asignadoActual();
+  const previo = {};
+  for (const id of Object.keys(a)) {
+    previo[id] = a[id];
+    const o = (semanas[wk] || {})["n_" + id];
+    if (typeof o === "string") previo["n_" + id] = o;
+  }
   const ids = Object.keys(previo);
-  if (!ids.length) { mostrarToast("No hay nada para reiniciar"); return; }
+  if (!Object.keys(a).length) { mostrarToast("No hay nada para reiniciar"); return; }
   const cambios = {};
   ids.forEach((id) => (cambios[id] = null));
   escribir(wk, cambios);
@@ -1027,12 +1154,34 @@ function render() {
 }
 
 let estClave = "";
+const ATR_NUM = 'type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false"';
+function campoHM(extra, etiqueta, hmax) {
+  return `<div class="est-campo" ${extra}><input class="est-input est-in" data-k="h" maxlength="${hmax || 2}" ${ATR_NUM} placeholder="0" aria-label="Horas ${etiqueta}"><span class="est-h">h</span><input class="est-input est-in" data-k="m" maxlength="2" ${ATR_NUM} placeholder="00" aria-label="Minutos ${etiqueta}"><span class="est-h">m</span></div>`;
+}
+// Lee un campo de horas+minutos: null = vacío, NaN = no válido, si no, los minutos totales.
+function leerHM(campo) {
+  const h = campo.querySelector('[data-k="h"]').value.trim(), m = campo.querySelector('[data-k="m"]').value.trim();
+  if (!h && !m) return null;
+  if (!/^\d*$/.test(h) || !/^\d*$/.test(m)) return NaN;
+  const mm = m ? +m : 0;
+  if (mm > 59) return NaN;
+  return (h ? +h : 0) * 60 + mm;
+}
+// min: valor cargado (o null). ph: minutos que se muestran en gris cuando está vacío.
+function ponerHM(campo, min, ph, activo) {
+  const H = campo.querySelector('[data-k="h"]'), M = campo.querySelector('[data-k="m"]');
+  H.placeholder = String(Math.floor((ph || 0) / 60));
+  M.placeholder = pad2((ph || 0) % 60);
+  if (activo && campo.contains(activo)) return;          // no pisar lo que estás escribiendo
+  if (min === null) { H.value = ""; M.value = ""; }
+  else { H.value = String(Math.floor(min / 60)); M.value = pad2(min % 60); }
+}
 function construirEstDias() {
   const fechas = fechasSemana(semanaKey);
   const hoyIdx = new Date().getDay();
   $("#estDias").innerHTML = DIAS.map((d, i) => `<div class="est-fila${i === hoyIdx ? " hoy" : ""}" data-i="${i}">
       <div class="dia-cab"><div class="dia-nombre">${d.abr}</div><div class="dia-fecha">${i === hoyIdx ? "Hoy" : `${fechas[i].getDate()} ${MESES[fechas[i].getMonth()]}`}</div></div>
-      <label class="est-campo"><input class="est-input" data-i="${i}" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Horas estudiadas el ${d.nombre.toLowerCase()}"><span class="est-h">h</span></label>
+      ${campoHM(`data-i="${i}"`, "estudiadas el " + d.nombre.toLowerCase(), 2)}
       <span class="est-estado"></span></div>`).join("");
   estClave = semanaKey + "|" + hoyIdx;
 }
@@ -1042,7 +1191,7 @@ function renderEstudio() { pintarEstudio(); }
 // Actualiza todo "en el lugar" para no cortar lo que estás escribiendo. override = lo que estás tipeando ahora.
 function pintarEstudio(override) {
   const activo = document.activeElement;
-  const enFoco = !!(activo && activo.classList && activo.classList.contains("est-input"));
+  const enFoco = !!(activo && activo.classList && activo.classList.contains("est-input") && activo.closest("#estDias"));
   if (!$("#matLista").children.length) construirMaterias();
   const clave = semanaKey + "|" + new Date().getDay();
   if (!enFoco && (clave !== estClave || !$("#estDias").children.length)) construirEstDias();
@@ -1074,20 +1223,18 @@ function pintarEstudio(override) {
 
   $("#estDias").querySelectorAll(".est-fila").forEach((fila) => {
     const d = c.dias[Number(fila.dataset.i)];
-    const input = fila.querySelector(".est-input");
     const campo = fila.querySelector(".est-campo");
     const estado = fila.querySelector(".est-estado");
-    if (input !== activo) input.value = d.cargado ? fmtInput(d.min) : "";
-    let ph = "—", cls = "", txt = "";
+    let ph = 0, cls = "", txt = "";
     if (d.cargado) {
       const diff = d.min - metaMin;
       cls = diff >= 0 ? "ok" : "falto";
       txt = diff === 0 ? "en la meta" : (diff > 0 ? "+" : "−") + fmt(Math.abs(diff));
     } else {
-      ph = c.falta === 0 ? "0" : fmtInput(c.objetivoPend);
+      ph = c.falta === 0 ? 0 : c.objetivoPend;
       txt = c.falta === 0 ? "libre" : "te toca";
     }
-    input.placeholder = ph;
+    ponerHM(campo, d.cargado ? d.min : null, ph, activo);
     campo.className = "est-campo" + (cls ? " " + cls : "") + (campo.classList.contains("error") ? " error" : "");
     estado.className = "est-estado" + (cls ? " " + cls : "");
     estado.textContent = txt;
@@ -1101,10 +1248,12 @@ function minMateria(id) {
   return Number.isInteger(v) && v >= 0 && v <= 10080 ? v : null;
 }
 function construirMaterias() {
-  $("#matLista").innerHTML = MATERIAS.map((m) => `<div class="mat-fila" style="--rgb:${m.rgb}">
-      <span class="mat-nombre"><i class="mat-punto"></i>${esc(m.nombre)}</span>
-      <label class="est-campo"><input class="est-input mat-input" data-m="${m.id}" type="text" inputmode="decimal" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="0" aria-label="Horas de ${esc(m.nombre)} esta semana"><span class="est-h">h</span></label>
-    </div>`).join("");
+  $("#matLista").innerHTML = MATERIAS.length
+    ? MATERIAS.map((m) => `<div class="mat-fila" style="--rgb:${m.rgb}">
+      <span class="mat-nombre"><i class="mat-punto"></i><span>${esc(m.nombre)}</span></span>
+      ${campoHM(`data-m="${m.id}"`, "de " + esc(m.nombre) + " esta semana", 3)}
+    </div>`).join("")
+    : `<p class="est-ayuda" style="margin:0">${materiasSinDatos ? "Cargando tus materias…" : 'No tenés materias. Tocá "Editar materias" para agregar.'}</p>`;
   $("#matBarra").innerHTML = MATERIAS.map((m) => `<i data-m="${m.id}" style="--rgb:${m.rgb};width:0"></i>`).join("");
 }
 function pintarMaterias(c, override) {
@@ -1119,8 +1268,8 @@ function pintarMaterias(c, override) {
   });
   const base = Math.max(c.hecho, suma, 1);
   MATERIAS.forEach((m) => {
-    const input = $(`#matLista .mat-input[data-m="${m.id}"]`);
-    if (input && input !== activo) input.value = vals[m.id] !== null ? fmtInput(vals[m.id]) : "";
+    const campo = $(`#matLista .est-campo[data-m="${m.id}"]`);
+    if (campo) ponerHM(campo, vals[m.id], 0, activo);
     const seg = $(`#matBarra i[data-m="${m.id}"]`);
     if (seg) seg.style.width = ((vals[m.id] || 0) / base) * 100 + "%";
   });
@@ -1129,13 +1278,17 @@ function pintarMaterias(c, override) {
   r.classList.toggle("alerta", suma > c.hecho);
   r.title = suma > c.hecho ? "Asignaste más horas a las materias que las cargadas por día" : "Horas asignadas a materias, sobre las estudiadas por día";
 }
-function confirmarMateria(t) {
-  const id = t.dataset.m, k = "m_" + id;
-  const min = parsearHoras(t.value);
+function restaurarCampo(campo, previo) {
+  ponerHM(campo, Number.isInteger(previo) ? previo : null, 0, null);
+}
+function confirmarMateria(campo) {
+  const id = campo.dataset.m, k = "m_" + id;
+  const min = leerHM(campo);
   const previo = (estSemanas[semanaKey] || {})[k];
+  campo.classList.remove("error");
   if (Number.isNaN(min) || (min !== null && min > 10080)) {
-    mostrarToast("No entendí ese número. Probá con 2,5 · 2:30 · 1h30");
-    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    mostrarToast("Revisá los números: minutos de 0 a 59");
+    restaurarCampo(campo, previo);
     pintarEstudio();
     return;
   }
@@ -1144,19 +1297,17 @@ function confirmarMateria(t) {
   escribirEst(semanaKey, { [k]: min });
 }
 
-function confirmarHoras(t) {
-  const i = Number(t.dataset.i), k = "d" + i;
-  const campo = t.closest(".est-campo");
-  const min = parsearHoras(t.value);
+function confirmarHoras(campo) {
+  const i = Number(campo.dataset.i), k = "d" + i;
+  const min = leerHM(campo);
   const previo = (estSemanas[semanaKey] || {})[k];
+  campo.classList.remove("error");
   if (Number.isNaN(min) || (min !== null && min > 1440)) {
-    campo.classList.remove("error");
-    mostrarToast("No entendí ese número. Probá con 2,5 · 2:30 · 1h30");
-    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
+    mostrarToast("Revisá los números: minutos de 0 a 59, máximo 24 h");
+    restaurarCampo(campo, previo);
     pintarEstudio();
     return;
   }
-  campo.classList.remove("error");
   if (min === null) {                                       // casillero vacío = sacar ese día
     if (previo !== undefined) escribirEst(semanaKey, { [k]: null }); else pintarEstudio();
     return;
@@ -1175,8 +1326,11 @@ function renderGym() {
   // Contador y barra segmentada (cada sesión hecha enciende un segmento con su color)
   const hechas = SESIONES.filter((s) => a[s.id] !== undefined);
   $("#hechas").textContent = hechas.length;
+  $("#totalSes").textContent = "/" + SESIONES.length;
   const barra = $("#segmentos");
   barra.setAttribute("aria-valuenow", hechas.length);
+  barra.setAttribute("aria-valuemax", SESIONES.length);
+  barra.style.gridTemplateColumns = `repeat(${Math.max(1, SESIONES.length)}, 1fr)`;
   barra.innerHTML = SESIONES.map((_, i) =>
     i < hechas.length ? `<i class="seg on" style="--rgb:${hechas[i].rgb}"></i>` : '<i class="seg"></i>'
   ).join("");
@@ -1186,8 +1340,10 @@ function renderGym() {
   $("#cuentaFaltan").textContent = faltan.length ? `(${faltan.length})` : "";
   $("#faltan").className = faltan.length ? "faltan" : "";
   $("#faltan").innerHTML = faltan.length
-    ? faltan.map((x) => `<button type="button" class="tarjeta" style="--rgb:${x.rgb}" data-accion="faltante" data-sid="${x.id}"><span class="t-nombre">${x.nombre}</span><span class="t-sub">${x.sub}</span></button>`).join("")
-    : '<p class="completa">Semana completa. Todas las sesiones están marcadas.</p>';
+    ? faltan.map((x) => `<button type="button" class="tarjeta" style="--rgb:${x.rgb}" data-accion="faltante" data-sid="${x.id}"><span class="t-nombre">${esc(x.nombre)}</span><span class="t-sub">${esc(x.sub || "")}</span></button>`).join("")
+    : (SESIONES.length
+        ? '<p class="completa">Semana completa. Todas las sesiones están marcadas.</p>'
+        : `<p class="completa">${sesionesSinDatos ? "Cargando tus sesiones…" : 'No tenés sesiones. Tocá "Editar sesiones" para agregar.'}</p>`);
 
   // Días: una tarjeta por día
   const porDia = {};
@@ -1198,7 +1354,7 @@ function renderGym() {
     const fecha = fechas[i];
     let tarjeta;
     if (x) {
-      tarjeta = `<button type="button" class="tarjeta lleno" style="--rgb:${x.rgb}" data-accion="chip" data-sid="${x.id}" aria-label="${x.nombre} el ${d.nombre.toLowerCase()}. Tocá para quitar"><span class="t-nombre">${x.nombre}</span><span class="t-sub">${x.sub}</span></button>`;
+      tarjeta = `<button type="button" class="tarjeta lleno" style="--rgb:${x.rgb}" data-accion="chip" data-sid="${x.id}" aria-label="${esc(nombreDe(x))} el ${d.nombre.toLowerCase()}. Tocá para renombrar o quitar"><span class="t-nombre">${esc(nombreDe(x))}</span><span class="t-sub">${renombrada(x) ? "" : esc(x.sub || "")}</span></button>`;
     } else if (faltan.length) {
       tarjeta = `<button type="button" class="tarjeta vacia" data-accion="dia" data-dia="${i}" aria-label="Agregar sesión al ${d.nombre.toLowerCase()}">${ICONO_MAS}<span>Tocá para elegir</span></button>`;
     } else {
@@ -1337,9 +1493,33 @@ function abrirSheetSesion(dia) {
   $("#sheetTitulo").textContent = `¿Qué hiciste el ${DIAS[dia].nombre.toLowerCase()}?`;
   $("#sheetOpciones").className = "grid-sesiones";
   $("#sheetOpciones").innerHTML = faltan.map((x) =>
-    `<button type="button" class="tarjeta" style="--rgb:${x.rgb}" data-accion="elegir-sesion" data-sid="${x.id}"><span class="t-nombre">${x.nombre}</span><span class="t-sub">${x.sub}</span></button>`
+    `<button type="button" class="tarjeta" style="--rgb:${x.rgb}" data-accion="elegir-sesion" data-sid="${x.id}"><span class="t-nombre">${esc(x.nombre)}</span><span class="t-sub">${esc(x.sub || "")}</span></button>`
   ).join("");
   abrirSheet();
+}
+function abrirSheetChip(sid) {
+  const x = sesionPorId(sid);
+  const dia = asignadoActual()[sid];
+  if (!x || dia === undefined) return;
+  ctxSheet = { tipo: "chip", sid };
+  $("#sheetTitulo").textContent = `${DIAS[dia].nombre}`;
+  $("#sheetOpciones").className = "";
+  $("#sheetOpciones").innerHTML = `<label class="ed-lab" for="chipNombre">¿Qué hiciste? Cambiá el nombre si fue otro entrenamiento</label>
+    <input id="chipNombre" class="ed-nombre" maxlength="24" autocomplete="off" spellcheck="false" value="${esc(nombreDe(x))}" aria-label="Nombre de lo que hiciste">
+    <p class="ed-ayuda" style="margin-top:0.5rem">Solo cambia este día de esta semana.</p>
+    <div class="acciones"><button type="button" class="btn-principal" data-accion="chip-guardar">Guardar</button><button type="button" class="btn-sec peligro" data-accion="chip-quitar">Quitar del día</button></div>`;
+  $("#sheet").classList.add("abierto");
+  setTimeout(() => { const i = $("#chipNombre"); if (i) { i.focus({ preventScroll: true }); i.select(); } }, 50);
+}
+function guardarNombreChip() {
+  if (!ctxSheet || ctxSheet.tipo !== "chip") return;
+  const sid = ctxSheet.sid, x = sesionPorId(sid);
+  const v = $("#chipNombre").value.trim().slice(0, 24);
+  cerrarSheet();
+  if (!x) return;
+  const previo = (semanas[semanaKey] || {})["n_" + sid];
+  if (!v || v === x.nombre) { if (previo !== undefined) escribir(semanaKey, { ["n_" + sid]: null }); }
+  else if (v !== previo) escribir(semanaKey, { ["n_" + sid]: v });
 }
 function abrirSheet() {
   $("#sheet").classList.add("abierto");
@@ -1353,12 +1533,12 @@ const PRESETS_MIN = [60, 90, 120, 150, 180, 240];
 function abrirHoras() {
   ctxHoras = { tipo: "meta" };
   $("#tituloHoras").textContent = "Meta diaria de estudio";
-  $("#ayudaHoras").textContent = "La meta de la semana es esto por 7. Escribilo como 2,5 · 2:30 · 1h30.";
-  $("#inputHoras").value = fmtInput(metaMin);
+  $("#ayudaHoras").textContent = "La meta de la semana es esto por 7. Ej: 2 h y 30 min.";
+  ponerHM($("#campoMeta"), metaMin, 150, null);
   $("#presetsHoras").innerHTML = PRESETS_MIN.map((m) => `<button type="button" class="preset" data-min="${m}">${fmt(m)}</button>`).join("");
   $("#errorHoras").textContent = "";
   $("#sheetHoras").classList.add("abierto");
-  setTimeout(() => { const i = $("#inputHoras"); i.focus({ preventScroll: true }); i.select(); }, 50);
+  setTimeout(() => { const i = $('#campoMeta [data-k="h"]'); i.focus({ preventScroll: true }); i.select(); }, 50);
 }
 function cerrarHoras() { $("#sheetHoras").classList.remove("abierto"); ctxHoras = null; }
 
@@ -1401,7 +1581,9 @@ document.addEventListener("click", (e) => {
   const dia = el.dataset.dia !== undefined ? Number(el.dataset.dia) : undefined;
   if (accion === "faltante") abrirSheetDia(sid);
   else if (accion === "dia") abrirSheetSesion(dia);
-  else if (accion === "chip") quitar(sid);
+  else if (accion === "chip") abrirSheetChip(sid);
+  else if (accion === "chip-guardar") guardarNombreChip();
+  else if (accion === "chip-quitar" && ctxSheet) { const q = ctxSheet.sid; cerrarSheet(); quitar(q); }
   else if (accion === "elegir-dia" && ctxSheet) { const s = ctxSheet.sid; cerrarSheet(); asignar(s, dia); }
   else if (accion === "elegir-sesion" && ctxSheet) { const d = ctxSheet.dia; cerrarSheet(); asignar(sid, d); }
   else if (accion === "vista") cambiarVista(el.dataset.vista);
@@ -1411,62 +1593,59 @@ $("#sheetCancelar").addEventListener("click", cerrarSheet);
 
 // Horas de estudio
 $("#btnMeta").addEventListener("click", abrirHoras);
-$("#matLista").addEventListener("input", (e) => {
-  const t = e.target.closest(".mat-input");
-  if (!t) return;
-  const min = parsearHoras(t.value);
-  const malo = Number.isNaN(min) || (min !== null && min > 10080);
-  t.closest(".est-campo").classList.toggle("error", malo);
-  pintarEstudio({ m: t.dataset.m, min: malo ? null : min });
-});
-$("#matLista").addEventListener("change", (e) => { const t = e.target.closest(".mat-input"); if (t) confirmarMateria(t); });
-$("#matLista").addEventListener("keydown", (e) => {
-  const t = e.target.closest(".mat-input");
-  if (!t) return;
-  if (e.key === "Enter") { e.preventDefault(); t.blur(); }
-  else if (e.key === "Escape") {
-    const previo = (estSemanas[semanaKey] || {})["m_" + t.dataset.m];
-    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
-    t.closest(".est-campo").classList.remove("error");
-    t.blur();
-    pintarEstudio();
-  }
-});
-$("#estDias").addEventListener("input", (e) => {
-  const t = e.target.closest(".est-input");
-  if (!t) return;
-  const min = parsearHoras(t.value);
-  const malo = Number.isNaN(min) || (min !== null && min > 1440);
-  t.closest(".est-campo").classList.toggle("error", malo);
-  pintarEstudio({ i: Number(t.dataset.i), min: malo ? null : min });   // vista previa en vivo
-});
-$("#estDias").addEventListener("change", (e) => { const t = e.target.closest(".est-input"); if (t) confirmarHoras(t); });
-$("#estDias").addEventListener("keydown", (e) => {
-  const t = e.target.closest(".est-input");
-  if (!t) return;
-  if (e.key === "Enter") { e.preventDefault(); t.blur(); }
-  else if (e.key === "Escape") {
-    const previo = (estSemanas[semanaKey] || {})["d" + t.dataset.i];
-    t.value = Number.isInteger(previo) ? fmtInput(previo) : "";
-    t.closest(".est-campo").classList.remove("error");
-    t.blur();
-    pintarEstudio();
-  }
-});
+function enlazarHM(contenedor, confirmar, claveDato, maxMin) {
+  const cont = $(contenedor);
+  const aMin = (c) => { const v = leerHM(c); return (Number.isNaN(v) || (v !== null && v > maxMin)) ? NaN : v; };
+  cont.addEventListener("input", (e) => {
+    const t = e.target.closest(".est-in");
+    if (!t) return;
+    const c = t.closest(".est-campo");
+    const limpio = t.value.replace(/\D/g, "");
+    if (limpio !== t.value) t.value = limpio;
+    const min = aMin(c);
+    c.classList.toggle("error", Number.isNaN(min));
+    const ov = Number.isNaN(min) ? null : min;
+    pintarEstudio(c.dataset.i !== undefined ? { i: Number(c.dataset.i), min: ov } : { m: c.dataset.m, min: ov });
+  });
+  cont.addEventListener("focusin", (e) => { if (e.target.classList && e.target.classList.contains("est-in")) e.target.select(); });
+  cont.addEventListener("focusout", (e) => {
+    const c = e.target.closest && e.target.closest(".est-campo");
+    if (!c || c.contains(e.relatedTarget)) return;        // sigue dentro del mismo campo (de horas a minutos)
+    confirmar(c);
+  });
+  cont.addEventListener("keydown", (e) => {
+    const t = e.target.closest(".est-in");
+    if (!t) return;
+    const c = t.closest(".est-campo");
+    const M = c.querySelector('[data-k="m"]'), H = c.querySelector('[data-k="h"]');
+    if (e.key === "Enter") { e.preventDefault(); t.blur(); }
+    else if (e.key === "Escape") {
+      const previo = (estSemanas[semanaKey] || {})[claveDato(c)];
+      restaurarCampo(c, previo);
+      c.classList.remove("error");
+      t.blur();
+      pintarEstudio();
+    } else if (t === H && [":", ",", ".", " ", "h", "H"].includes(e.key)) { e.preventDefault(); M.focus(); }
+    else if (t === M && e.key === "Backspace" && !M.value) { e.preventDefault(); H.focus(); }
+  });
+}
+enlazarHM("#estDias", confirmarHoras, (c) => "d" + c.dataset.i, 1440);
+enlazarHM("#matLista", confirmarMateria, (c) => "m_" + c.dataset.m, 10080);
+$("#matLista").setAttribute("data-hm", "1");
 $("#cancelarHoras").addEventListener("click", cerrarHoras);
 $("#sheetHoras").addEventListener("click", (e) => { if (e.target === $("#sheetHoras")) cerrarHoras(); });
 $("#presetsHoras").addEventListener("click", (e) => {
   const b = e.target.closest("[data-min]");
   if (!b) return;
-  $("#inputHoras").value = fmtInput(Number(b.dataset.min));
+  ponerHM($("#campoMeta"), Number(b.dataset.min), 150, null);
   $("#errorHoras").textContent = "";
-  $("#inputHoras").focus({ preventScroll: true });
+  $('#campoMeta [data-k="m"]').focus({ preventScroll: true });
 });
 $("#formHoras").addEventListener("submit", (e) => {
   e.preventDefault();
-  const min = parsearHoras($("#inputHoras").value);
+  const min = leerHM($("#campoMeta"));
   if (min === null || Number.isNaN(min) || !metaValida(min)) {
-    $("#errorHoras").textContent = "Escribilo así: 2,5 · 2:30 · 1h30 (entre 15 minutos y 24 h).";
+    $("#errorHoras").textContent = "Poné horas y minutos (minutos de 0 a 59), entre 15 min y 24 h.";
     return;
   }
   metaMin = min;
@@ -1475,6 +1654,104 @@ $("#formHoras").addEventListener("submit", (e) => {
   guardarAjustesEst({ meta: String(min) });
   mostrarToast(`Meta diaria: ${fmt(min)}`);
 });
+
+// Editor de materias y sesiones
+let edTipo = null, edBorrador = [];
+function leerEd() {
+  const filas = [...document.querySelectorAll("#listaEd .fila-ed")];
+  edBorrador = filas.map((f, i) => ({
+    ...edBorrador[i],
+    nombre: f.querySelector(".ed-nombre").value,
+    sub: f.querySelector(".ed-sub") ? f.querySelector(".ed-sub").value : undefined
+  }));
+}
+function pintarEd() {
+  const ses = edTipo === "ses";
+  $("#listaEd").innerHTML = edBorrador.map((m, i) => `<div class="fila-ed" style="--rgb:${m.rgb}">
+    <button type="button" class="ed-color" data-accion="ed-color" data-i="${i}" aria-label="Cambiar color" style="--rgb:${m.rgb}"></button>
+    <div class="ed-datos"><input type="text" class="ed-nombre" maxlength="${ses ? 18 : 20}" placeholder="${ses ? "Nombre (ej. Natación)" : "Nombre de la materia"}" value="${esc(m.nombre)}" aria-label="Nombre">${ses ? `<input type="text" class="ed-sub" maxlength="36" placeholder="Detalle (opcional)" value="${esc(m.sub || "")}" aria-label="Detalle">` : ""}</div>
+    <button type="button" class="f-quitar" data-accion="ed-quitar" data-i="${i}" aria-label="Quitar">✕</button></div>`).join("");
+  $("#agregarEd").hidden = edBorrador.length >= (ses ? MAX_SES : MAX_MAT);
+}
+function abrirEd(tipo) {
+  if ((tipo === "mat" && materiasSinDatos) || (tipo === "ses" && sesionesSinDatos)) { mostrarToast("Todavía estoy cargando tus datos. Probá en unos segundos."); return; }
+  edTipo = tipo; ocultarToast();
+  const ses = tipo === "ses";
+  edBorrador = (ses ? sesionesReales : materiasReales).map((m) => ({ ...m }));
+  $("#tituloEd").textContent = ses ? "Sesiones de entrenamiento" : "Materias";
+  $("#ayudaEd").textContent = ses
+    ? "Estas son las opciones que aparecen en “Te falta”. Podés sacar, renombrar o agregar las que quieras (hasta 7, una por día)."
+    : "Las materias que reciben horas. Si ya rendiste una, sacala; las horas que tenía cargadas esta semana se borran.";
+  $("#agregarEd").textContent = ses ? "+ Agregar sesión" : "+ Agregar materia";
+  $("#errorEd").textContent = "";
+  pintarEd();
+  $("#sheetEd").classList.add("abierto");
+}
+function cerrarEd() { $("#sheetEd").classList.remove("abierto"); edTipo = null; }
+function guardarEd() {
+  leerEd();
+  const ses = edTipo === "ses";
+  const pal = ses ? COLORES_GYM : COLORES_FECHAS;
+  const viejos = (ses ? sesionesReales : materiasReales).map((m) => m.id);
+  const lista = edBorrador.map((m) => ({
+    id: m.id || idNuevo(ses ? "s" : "m"),
+    nombre: String(m.nombre || "").trim().slice(0, ses ? 18 : 20),
+    rgb: m.rgb || pal[0],
+    ...(ses ? { sub: String(m.sub || "").trim().slice(0, 36) } : {})
+  })).filter((m) => m.nombre);
+  const txt = ses ? serSes(lista) : serMat(lista);
+  if (txt.length > 590) { $("#errorEd").textContent = "Es demasiado texto: acortá los nombres o detalles."; return; }
+  const borradas = viejos.filter((id) => !lista.some((m) => m.id === id));
+  if (ses) {
+    sesionesReales = lista; sesionesSinDatos = false;
+    ls.set(LS_SES + CODIGO, txt);
+    refrescarSesiones();
+    const cam = {};
+    const raw = semanas[semanaKey] || {};
+    borradas.forEach((id) => { if (id in raw) cam[id] = null; if (("n_" + id) in raw) cam["n_" + id] = null; });
+    if (Object.keys(cam).length) escribir(semanaKey, cam);
+    guardarAjustesEst({ sesiones: txt });
+  } else {
+    materiasReales = lista; materiasSinDatos = false;
+    ls.set(LS_MAT + CODIGO, txt);
+    refrescarMaterias();
+    const cam = {};
+    const raw = estSemanas[semanaKey] || {};
+    borradas.forEach((id) => { if (("m_" + id) in raw) cam["m_" + id] = null; });
+    if (Object.keys(cam).length) escribirEst(semanaKey, cam);
+    guardarAjustesEst({ materias: txt });
+  }
+  cerrarEd();
+  render();
+  mostrarToast(ses ? "Sesiones guardadas" : "Materias guardadas");
+}
+$("#btnMaterias").addEventListener("click", () => abrirEd("mat"));
+$("#btnSesiones").addEventListener("click", () => abrirEd("ses"));
+$("#cancelarEd").addEventListener("click", cerrarEd);
+$("#guardarEd").addEventListener("click", guardarEd);
+$("#sheetEd").addEventListener("click", (e) => { if (e.target === $("#sheetEd")) cerrarEd(); });
+$("#agregarEd").addEventListener("click", () => {
+  leerEd();
+  const ses = edTipo === "ses", pal = ses ? COLORES_GYM : COLORES_FECHAS;
+  const usados = edBorrador.map((m) => m.rgb);
+  edBorrador.push({ id: "", nombre: "", ...(ses ? { sub: "" } : {}), rgb: pal.find((c) => !usados.includes(c)) || pal[edBorrador.length % pal.length] });
+  pintarEd();
+  const inputs = document.querySelectorAll("#listaEd .ed-nombre");
+  if (inputs.length) inputs[inputs.length - 1].focus();
+});
+$("#listaEd").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-accion]");
+  if (!b) return;
+  leerEd();
+  const i = Number(b.dataset.i);
+  if (b.dataset.accion === "ed-quitar") edBorrador.splice(i, 1);
+  else if (b.dataset.accion === "ed-color") {
+    const pal = edTipo === "ses" ? COLORES_GYM : COLORES_FECHAS;
+    edBorrador[i].rgb = pal[(pal.indexOf(edBorrador[i].rgb) + 1) % pal.length];
+  }
+  pintarEd();
+});
+$("#sheetOpciones").addEventListener("keydown", (e) => { if (e.key === "Enter" && e.target.id === "chipNombre") { e.preventDefault(); guardarNombreChip(); } });
 
 // Editor de fechas
 $("#btnFechas").addEventListener("click", abrirEditorFechas);
@@ -1498,6 +1775,7 @@ $("#listaEditorFechas").addEventListener("click", (e) => {
 
 document.addEventListener("keydown", (e) => {
   if (e.key !== "Escape") return;
+  if ($("#sheetEd").classList.contains("abierto")) { cerrarEd(); return; }
   cerrarSheet(); cerrarHoras(); cerrarEditorFechas();
 });
 
@@ -1571,7 +1849,10 @@ document.addEventListener("visibilitychange", () => {
 /* ---------- Inicio ---------- */
 (function iniciar() {
   cargarCache();
-  if (!db) sembrarFechas();                      // sin Firebase: lista inicial solo en este dispositivo
+  if (!db) { sembrarFechas(); sembrarMaterias(); sembrarSesiones(); }   // sin Firebase: listas iniciales solo en este dispositivo
+  setTimeout(() => {                             // sin datos tras unos segundos (sin conexión): mostrar las de fábrica, solo para mirar
+    if (materiasSinDatos || sesionesSinDatos) { baseVisible = true; refrescarMaterias(); refrescarSesiones(); render(); }
+  }, 6000);
   mostrarApp();
   suscribirGym();
   suscribirEst();
